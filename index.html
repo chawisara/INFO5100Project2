@@ -21,9 +21,7 @@
 
 	<script>
 		var svg = d3.select("#map");
-
 		var projection;
-		var pathGenerator;
 		var mapData;
 		var imgData, weatherTimeData, statsData;
 
@@ -32,10 +30,8 @@
 
 		d3.json("nyc.json", function(json){
 
-			projection = d3.geoMercator();
-			pathGenerator = d3.geoPath().projection(projection);
-
-			projection.fitExtent([[0, 10], [880, 800]], json);
+			projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json)
+			var pathGenerator = d3.geoPath().projection(projection);
 
 			svg.selectAll("path")
 			.data(json.features)
@@ -99,8 +95,8 @@
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
-				if(data.City=="New_York" && data.Latitude<42 && data.Latitude>39 && data.Longitude<-73 && data.Longitude>-75){
-					var coordinate=[data.Latitude, data.Longitude];
+				if(data.City=="New_York" && data.Latitude<42 && data.Latitude>39 && data.Longitude<-73 && data.Longitude>-74.1){
+					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
 					var hour=data.Hour;
 					var minute=data.Minute;
@@ -141,12 +137,12 @@
 			var pokemons = dataPoints(imgdata, weatherdata, statsdata);
 
 			pokemons.forEach(function (pokemon) {
-				svg.append("circle")
-					.attr("cx", projection(pokemon.coordinate)[0])
-					.attr("cy", projection(pokemon.coordinate)[1])
-					.attr("r", 3)
-					.style("opacity", 0.8)
-					.style("fill", "red");
+				svg.append("image")
+					.attr("x", projection(pokemon.coordinate)[0])
+					.attr("y", projection(pokemon.coordinate)[1])
+					.attr("height", 20)
+					.attr("width", 20)
+					.attr("href", pokemon.imgURL);
 			});
 		}
 	</script>
