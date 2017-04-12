@@ -17,7 +17,7 @@
 </head>
 
 <body>
-	<svg id="map" height="600" width="1200"></svg><br><font size = "3">
+	<svg id="map" height="900" width="900"></svg><br><font size = "3">
 
 	<script>
 		var svg = d3.select("#map");
@@ -124,7 +124,14 @@
 
 		function showMap(mapdata, imgdata, weatherdata, statsdata) {
 
-			projection.fitExtent([[0,0], [svg.attr("width"), svg.attr("height")]]);
+			var bounds = pathGenerator.bounds(mapdata);
+
+			xScale = 900 / Math.abs(bounds[1][0] - bounds[0][0]);
+			yScale = 900 / Math.abs(bounds[1][1] - bounds[0][1]);
+			scale = xScale < yScale ? xScale : yScale;
+
+			var transl = [(900 - scale * (bounds[1][0] + bounds[0][0])) / 2, (900 - scale * (bounds[1][1] + bounds[0][1])) / 2];
+			projection.scale(scale).translate(transl);
 
 			svg.selectAll("path").data(mapdata.features)
 			.enter()
@@ -134,6 +141,7 @@
 			var pokemons = dataPoints(imgdata, weatherdata, statsdata);
 
 			pokemons.forEach(function (pokemon) {
+
 			});
 		}
 	</script>
