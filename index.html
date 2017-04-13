@@ -9,15 +9,15 @@
 	path { fill: #ccc; stroke: #888; }
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="http://d3js.org/topojson.v2.min.js"></script>
 <script src="https://d3js.org/d3-array.v1.min.js"></script>
-<script src="https://d3js.org/d3-geo.v1.min.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
 
 </head>
 
 <body>
-	<svg id="map" height="810" width="900"></svg><br><font size = "3">
+	<svg id="map" height="810" width="900">
+		<rect id="gym" x="740" y="650" height="150" width="150" style="fill:none; stroke-width:3; stroke:black"></div>
+	</svg><br><font size = "3">
 
 	<script>
 		var svg = d3.select("#map");
@@ -95,7 +95,7 @@
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
-				if(data.City=="New_York" && data.Latitude<42 && data.Latitude>39 && data.Longitude<-73 && data.Longitude>-74.1){
+				if(data.Latitude<42 && data.Latitude>39 && data.Longitude<-73 && data.Longitude>-74.1){
 					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
 					var hour=data.Hour;
@@ -132,19 +132,126 @@
 			return points;
 		}
 
+		//var drag =d3.behavior.drag();
+
+		var pokemon1, pokemon2;
+		var numpokemons=0;
+
 		function showPokemon(imgdata, weatherdata, statsdata) {
 
 			var pokemons = dataPoints(imgdata, weatherdata, statsdata);
 
-			pokemons.forEach(function (pokemon) {
-				svg.append("image")
-					.attr("x", projection(pokemon.coordinate)[0])
-					.attr("y", projection(pokemon.coordinate)[1])
-					.attr("height", 20)
-					.attr("width", 20)
-					.attr("href", pokemon.imgURL);
-			});
+			svg.selectAll("image")
+			.data(pokemons)
+			.enter().append("image")
+			.attr("id", function(d){return d.name;})
+			.attr("x", function(d){return projection(d.coordinate)[0];})
+			.attr("y", function(d){return projection(d.coordinate)[1];})
+			.attr("height", 20)
+			.attr("width", 20)
+			.attr("href", function(d){return d.imgURL;})
+			.classed("draggable", "true")
+			.attr("opacity", 0.6)
+			.on("mouseover", function(){
+				this.setAttribute("opacity", 1.0);
+				this.setAttribute("cursor", "pointer");
+			})
+			.on("mouseout", function(){
+				this.setAttribute("opacity", 0.6);
+				this.setAttribute("cursor", "default");
+			})
+			.call(d3.drag()
+				.on("start", dragstarted)
+				.on("drag", dragged)
+				.on("end", dragended));
 		}
+
+		//reference: https://bl.ocks.org/mbostock/22994cc97fefaeede0d861e6815a847e
+		function dragstarted(d) {
+			d3.select(this).raise().classed("active", true);
+		}
+
+		function dragged(d) {
+			d3.select(this).attr("x", d3.event.x).attr("y", d3.event.y);
+		}
+
+		function dragended(d) {
+			d3.select(this).classed("active", false);
+
+			if(!(d3.event.x>=740 && d3.event.y>=650)){
+				d3.select(this).attr("x", projection(d.coordinate)[0]).attr("y", projection(d.coordinate)[1]);
+			}else{
+				numpokemons++;
+				if(numpokemons==1){
+					pokemon1=d;
+				}else if(numpokemons==2){
+					numpokemons=0;
+					pokemon2=d;
+					d3.select(this).attr("x", projection(d.coordinate)[0]).attr("y", projection(d.coordinate)[1]);
+					d3.selectAll("#"+pokemon1.name).attr("x", projection(pokemon1.coordinate)[0]).attr("y", projection(pokemon1.coordinate)[1]);
+					showBattle(pokemon1, pokemon2);
+				}
+			}
+		}
+
+		function showBattle(pokemon1, pokemon2){
+			svg.append("rect")
+				.attr("id","tempbg")
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("height", 810)
+				.attr("width", 900)
+				.style("fill", "white")
+				.style("opacity", 0.5);
+
+			svg.append("image")
+			.attr("id", "pokemon1")
+			.attr("x", 200)
+			.attr("y", 300)
+			.attr("height", 220)
+			.attr("width", 200)
+			.attr("href", function(d){return pokemon1.imgURL;});
+
+			svg.append("image")
+			.attr("id", "pokemon2")
+			.attr("x", 500)
+			.attr("y", 300)
+			.attr("height", 220)
+			.attr("width", 200)
+			.attr("href", function(d){return pokemon2.imgURL;});
+
+			svg.append("text")
+			.attr("id", "vs")
+			.attr("x", width/2)
+			.attr("y", height/2)
+			.style("text-anchor","middle")
+			.style("font-family","Muli")
+			.style("font-size", 30)
+			.text("VS");
+
+			svg.append("text")
+			.attr("id", "close")
+			.attr("x", width/2)
+			.attr("y", (height/2)+200)
+			.style("text-anchor","middle")
+			.style("font-family","Muli")
+			.style("font-size", 20)
+			.text("[ close ]")
+			.on("mouseover", function(){
+				this.setAttribute("cursor", "pointer");
+			})
+			.on("click", removePopup);
+		}
+
+		function removePopup(){
+			d3.select("#tempbg").remove();
+			d3.select("#pokemon1").remove();
+			d3.select("#pokemon2").remove();
+			d3.select("#vs").remove();
+			d3.select("#close").remove();
+		}
+
+
 	</script>
 </body>
 
