@@ -17,7 +17,13 @@
 <body>
 	<svg id="map" height="810" width="900">
 		<rect id="gym" x="740" y="650" height="150" width="150" style="fill:none; stroke-width:3; stroke:black"></div>
-	</svg><br><font size = "3">
+	</svg><br>
+	<div id="buttons">
+		<button id="clear"><img src="./weathericon/clear1x.png" style="width:128px;height:128px;"></button>
+		<button id="cloudy"><img src="./weathericon/cloudy1x.png" style="width:128px;height:128px;"></button>
+		<button id="drizzle"><img src="./weathericon/rain1x.png" style="width:128px;height:128px;"></button>
+		<button id="breezy"><img src="./weathericon/snow1x.png" style="width:128px;height:128px;"></button>
+	</div>
 
 	<script>
 		var svg = d3.select("#map");
@@ -132,8 +138,6 @@
 			return points;
 		}
 
-		//var drag =d3.behavior.drag();
-
 		var pokemon1, pokemon2;
 		var numpokemons=0;
 
@@ -145,6 +149,7 @@
 			.data(pokemons)
 			.enter().append("image")
 			.attr("id", function(d){return d.name;})
+			.attr("class", function(d){return d.weather;})
 			.attr("x", function(d){return projection(d.coordinate)[0];})
 			.attr("y", function(d){return projection(d.coordinate)[1];})
 			.attr("height", 20)
@@ -165,6 +170,28 @@
 				.on("drag", dragged)
 				.on("end", dragended));
 		}
+
+		function clear_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".Clear").style("opacity", 0.6);
+		}
+		function cloudy_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".Overcast").style("opacity", 0.6);
+		}
+		function drizzle_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".Drizzle").style("opacity", 0.6);
+		}
+		function breezy_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".Breezy").style("opacity", 0.6);
+		}
+
+		d3.select("#clear").on("click", clear_clicked);
+		d3.select("#cloudy").on("click", cloudy_clicked);
+		d3.select("#drizzle").on("click", drizzle_clicked);
+		d3.select("#breezy").on("click", breezy_clicked);
 
 		//reference: https://bl.ocks.org/mbostock/22994cc97fefaeede0d861e6815a847e
 		function dragstarted(d) {
