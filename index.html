@@ -222,7 +222,7 @@
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
-				if(data.Latitude<40.79 && data.Latitude>40.77 && data.Longitude<-73 && data.Longitude>-74.1){
+				if(data.Latitude<41 && data.Latitude>40.4 && data.Longitude<-73.5 && data.Longitude>-74.1){
 					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
 					var hour=data.Hour;
@@ -265,6 +265,8 @@
 		var pokemon1, pokemon2;
 		var numpokemons=0;
 
+		var currentweather="Clear";
+
 		function showPokemon(pokemons, hour, minute) {
 			var minhr, maxhr, minminute, maxminute;
 			if(minute<15){
@@ -296,8 +298,7 @@
 			.data(pokemons)
 			.enter().append("image")
 			.filter(function(d){
-				return (d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute);
-				
+				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
 			})
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
 			.attr("class", function(d){return d.weather+" "+d.timeOfDay;})
@@ -543,23 +544,23 @@
 		d3.select("#evening").on("click", evening_clicked);
 		d3.select("#night").on("click", night_clicked);
 
-		
-
-		
-
 		function clear_clicked(){
+			currentweather="Clear";
 			svg.selectAll("image").style("opacity", 0);
 			svg.selectAll(".Clear").style("opacity", 0.6);
 		}
 		function cloudy_clicked(){
+			currentweather="Overcast";
 			svg.selectAll("image").style("opacity", 0);
 			svg.selectAll(".Overcast").style("opacity", 0.6);
 		}
 		function drizzle_clicked(){
+			currentweather="Drizzle";
 			svg.selectAll("image").style("opacity", 0);
 			svg.selectAll(".Drizzle").style("opacity", 0.6);
 		}
 		function breezy_clicked(){
+			currentweather="Breezy";
 			svg.selectAll("image").style("opacity", 0);
 			svg.selectAll(".Breezy").style("opacity", 0.6);
 		}
