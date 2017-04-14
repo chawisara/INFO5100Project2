@@ -106,6 +106,18 @@
 	 font-size: 24px;
  }
 
+ #clock{
+	position: absolute;
+	top:225;
+	left:980;
+ }
+
+ #timeinput{
+ 	position: absolute;
+	top:215;
+	left:960;
+ }
+
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-array.v1.min.js"></script>
@@ -115,18 +127,20 @@
 
 <body>
 	<svg id="map" height="810" width="1200">
+		<text id="zoomin" x="800" y="500" style="text-anchor: middle; font-size: 20; font-weight:bold">+</text>
+		<text id="zoomout" x="800" y="520" style="text-anchor: middle; font-size: 20; font-weight:bold">-</text>
 		<img id="logo" src="Pokemon-logo.png" alt="logo" height="80" width="208">
 		<p id="intro">This interactive web shows the distribution of <br>Pokemons in New
 		York City area in PokemonGo. <p>
 	</svg>
 	<audio id="fireaudio" src="fire.mp3"></audio>
-<input type="range" id="timeinput" min=0 max=24 style="width:500px"/><br>
-<svg id="clock" height="500" width="500"></svg>
+	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
+	<svg id="clock" height="140" width="140" transform="scale(0.3)"></svg>
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Let them battle!</p>
 	<svg width="1400" height="1000">
-	  <rect id="gym" width="250" height="120" x="950" y="400" style="fill:white;stroke-width:1;stroke:#3664AD" />
+	  <rect id="gym" width="250" height="120" x="950" y="360" style="fill:white;stroke-width:1;stroke:#3664AD" />
 		<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
 	</svg>
 	<div id="buttons">
@@ -146,6 +160,7 @@
 		var width=900;
 		var height=900;
 
+		////clock code is inspired from http://bl.ocks.org/tomgp/6475678
 		var radians = 0.0174532925,
 			clockRadius = 200,
 			hourHandLength = 2*clockRadius/3,
@@ -161,48 +176,175 @@
 			hourLabelRadius = clockRadius - 40
 			hourLabelYOffset = 7;
 
-			var hourScale = d3.scaleLinear()
-				.range([0,330])
-				.domain([0,11]);
+		var hourScale = d3.scaleLinear()
+			.range([0,330])
+			.domain([0,11]);
 
-			var minuteScale = secondScale = d3.scaleLinear()
-				.range([0,354])
-				.domain([0,59]);
+		var minuteScale = secondScale = d3.scaleLinear()
+			.range([0,354])
+			.domain([0,59]);
 
-			var handData = [
-				{
-					type:'hour',
-					value:0,
-					length:-hourHandLength,
-					scale:hourScale
-				},
-				{
-					type:'minute',
-					value:0,
-					length:-minuteHandLength,
-					scale:minuteScale
-				},
-				{
-					type:'second',
-					value:0,
-					length:-secondHandLength,
-					scale:secondScale,
-					balance:secondHandBalance
+		var handData = [
+			{
+				type:'hour',
+				value:0,
+				length:-hourHandLength,
+				scale:hourScale
+			},
+			{
+				type:'minute',
+				value:0,
+				length:-minuteHandLength,
+				scale:minuteScale
+			},
+			{
+				type:'second',
+				value:0,
+				length:-secondHandLength,
+				scale:secondScale,
+				balance:secondHandBalance
+			}
+		];
+
+		var hr, min;
+
+		var currentzoom=0;
+		var zoomed=false;
+		var translation=[0,0];
+		var translated=false;
+		var currentposition=[0,0];
+
+		loadMap(currentzoom, translation);
+
+		//reference: http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
+		d3.selection.prototype.moveToBack = function() {  
+	        return this.each(function() { 
+	            var firstChild = this.parentNode.firstChild; 
+	            if (firstChild) { 
+	                this.parentNode.insertBefore(this, firstChild); 
+	            }
+	        });
+	    };
+
+		function loadMap(currentzoom, translation){
+
+			if(hr==null && min==null){
+				var t = new Date();
+				hr=t.getHours();
+				min=t.getMinutes();
+			}
+
+			d3.json("manhattan.geojson", function(json){
+				if(!zoomed){
+					projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
+				}else{
+					if(currentzoom==0){
+						projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}else if(currentzoom==1){
+						projection = d3.geoMercator().fitExtent([[-500, -400], [1280, 1200]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}else if(currentzoom==2){
+						projection = d3.geoMercator().fitExtent([[-1150, -800], [1780, 1700]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}else if(currentzoom==3){
+						projection = d3.geoMercator().fitExtent([[-1900, -1900], [2480, 2500]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}
 				}
-			];
 
-		d3.json("manhattan.geojson", function(json){
+				var pathGenerator = d3.geoPath().projection(projection);
 
-			projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json)
-			var pathGenerator = d3.geoPath().projection(projection);
+				svg.selectAll("path").remove();
 
-			svg.selectAll("path")
-			.data(json.features)
-			.enter()
-			.append("path")
-			.attr("d", pathGenerator);
+				svg.selectAll("path")
+				.data(json.features)
+				.enter()
+				.append("path")
+				.attr("d", pathGenerator)
+				.moveToBack();
 
-		});
+				if(translated){
+					svg.selectAll("path").transition()
+					.attr("transform", "translate(" + translation[0] + ", " + translation[1] + ")");
+					
+				}
+
+			});
+		}
+
+		d3.select("#zoomin")
+		.on("mouseover", function(){
+				this.setAttribute("cursor", "pointer");
+			})
+		.on("click", zoomIn);
+
+		d3.select("#zoomout")
+		.on("mouseover", function(){
+				this.setAttribute("cursor", "pointer");
+			})
+		.on("click", zoomOut);
+
+		function zoomIn(){
+			translation=[0,0];
+			translated=false;
+			if(currentzoom<3){
+				zoomed=true;
+				currentzoom++;
+				loadMap(currentzoom);
+			}else{
+				currentzoom=3;
+			}
+		}
+
+		function zoomOut(){
+			translation=[0,0];
+			translated=false;
+			if(currentzoom>0){
+				zoomed=true;
+				currentzoom--;
+				loadMap(currentzoom);
+			}else{
+				currentzoom=0;
+			}
+		}
+
+		d3.select("#map")
+		.call(d3.drag()
+				.on("start", dragstartedmap)
+				.on("drag", draggedmap)
+				.on("end", dragendedmap));
+
+		var startingX=0, startingY=0;
+
+		function dragstartedmap(d) {
+			this.setAttribute("cursor", "move");
+			startingX=d3.event.x;
+			startingY=d3.event.y;
+		}
+
+		function draggedmap(d) {
+			if(currentzoom==0){
+				translated=false;
+			}else{
+				translated=true;
+			}
+			var currentX=d3.event.x;
+			var currentY=d3.event.y;
+			translation=[currentX-startingX, currentY-startingY]
+			currentposition[0]+=translation[0];
+			currentposition[1]+=translation[1];
+			loadMap(currentzoom, translation);
+		}
+
+		function dragendedmap(d) {
+			this.setAttribute("cursor", "default");
+
+		}
 
 		var parseRowImg = function(line) {
 			return{
@@ -262,23 +404,21 @@
 			showPokemon(pokemons, t.getHours(), t.getMinutes());
 		});
 
-   var hr, min;
-
-	 d3.select("#timeinput")
-	 .on("input", function() {
-		 var time=+this.value;
-		 hr=Math.floor(time);
-		 min=Math.ceil((time%1)*60);
-		 updateData();
-		 moveHands();
-		 svg.selectAll("image").remove().transition();
-		 showPokemon(pokemons, hr, min);
-	 });
+		d3.select("#timeinput")
+		.on("input", function() {
+			var time=+this.value;
+			hr=Math.floor(time);
+			min=Math.ceil((time%1)*60);
+			updateData();
+			moveHands();
+			svg.selectAll("image").remove().transition();
+			showPokemon(pokemons, hr, min);
+		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
-				if(data.Latitude<42 && data.Latitude>39 && data.Longitude<-73 && data.Longitude>-74.1){
+				if(data.Latitude<40.77 && data.Latitude>40.4 && data.Longitude<-73.5 && data.Longitude>-74.1){
 					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
 					var hour=data.Hour;
@@ -628,7 +768,7 @@
 
 			svg.append("rect")
 			.attr("id","draghighlight")
-			.attr("x", (width/2)-225-10)
+			.attr("x", (width/2)-225+60)
 			.attr("y", 20)
 			.attr("rx", 20)
 			.attr("ry", 20)
@@ -640,7 +780,7 @@
 
 			svg.append("text")
 			.attr("id", "dragtext")
-			.attr("x", width/2)
+			.attr("x", 60+width/2)
 			.attr("y", 40)
 			.style("text-anchor","middle")
 			.style("font-family","Muli")
@@ -665,6 +805,9 @@
 			d3.select("#draghighlight").remove();
 			d3.select("#dragtext").remove();
 
+			d3.select(this).attr("width", "20")
+			d3.select(this).attr("height", "20");
+
 			if(!(d3.event.x>=880 && d3.event.y>=400)){
 				if(pokemon1==d){
 					numpokemons=0;
@@ -681,15 +824,15 @@
 				numpokemons++;
 				if(numpokemons==1){
 					pokemon1=d;
-					d3.select(this).attr("opacity", 1)
-					d3.select(this).attr("width", "60")
+					d3.select(this).attr("opacity", 1);
+					d3.select(this).attr("width", "60");
 					d3.select(this).attr("height", "60");
 				}else if(numpokemons==2){
 					numpokemons=0;
 					pokemon2=d;
 					var latitude=pokemon1.coordinate[1].toString().replace(".", "");
-					d3.select(this).attr("x", projection(d.coordinate)[0]).attr("y", projection(d.coordinate)[1]).attr("opacity", 1);
-					d3.select("#"+pokemon1.name+""+latitude).attr("x", projection(pokemon1.coordinate)[0]).attr("y", projection(pokemon1.coordinate)[1]).attr("opacity", 1);
+					d3.select(this).attr("x", projection(d.coordinate)[0]).attr("y", projection(d.coordinate)[1]).attr("width",20).attr("height",20);
+					d3.select("#"+pokemon1.name+""+latitude).attr("x", projection(pokemon1.coordinate)[0]).attr("y", projection(pokemon1.coordinate)[1]).attr("width",20).attr("height",20);
 					showBattle(pokemon1, pokemon2);
 				}
 			}
