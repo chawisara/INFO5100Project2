@@ -7,6 +7,50 @@
 	body {font-family: "Muli", sans-serif; }
 	svg {border: solid #ccc 1px; }
 	path { fill: #ccc; stroke: #888; }
+
+	/*reference: http://bl.ocks.org/tomgp/6475678*/
+	#rim {
+		fill: none;
+		stroke: #999;
+		stroke-width: 3px;
+	}
+
+	.second-hand{
+		stroke-width:3;
+	}
+
+	.minute-hand{
+		stroke-width:8;
+		stroke-linecap:round;
+	}
+
+	.hour-hand{
+		stroke-width:12;
+		stroke-linecap:round;
+	}
+
+	.hands-cover{
+		stroke-width:3;
+		fill:#fff;
+	}
+
+	.second-tick{
+		stroke-width:3;
+		fill:#000;	
+	}
+
+	.hour-tick{
+		stroke-width:8;
+	}
+
+	.second-label{
+		font-size: 12px;
+	}
+
+	.hour-label{
+		font-size: 24px;
+	}
+
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/d3-array.v1.min.js"></script>
@@ -16,9 +60,15 @@
 
 <body>
 	<svg id="map" height="810" width="900">
-		<rect id="gym" x="740" y="650" height="150" width="150" style="fill:none; stroke-width:3; stroke:black"></div>
+		<rect id="gym" x="740" y="650" height="150" width="150" style="fill:none; stroke-width:3; stroke:black"/></div>
 	</svg><br>
+	<input type="range" id="timeinput" min=0 max=24 style="width:480px"/><br>
+	<svg id="clock" height="500" width="500"></svg>
 	<div id="buttons">
+		<button id="morning">Morning</button>
+		<button id="afternoon">Afternoon</button>
+		<button id="evening">Everning</button>
+		<button id="night">Night</button><br>
 		<button id="clear"><img src="./weathericon/clear1x.png" style="width:128px;height:128px;"></button>
 		<button id="cloudy"><img src="./weathericon/cloudy1x.png" style="width:128px;height:128px;"></button>
 		<button id="drizzle"><img src="./weathericon/rain1x.png" style="width:128px;height:128px;"></button>
@@ -34,7 +84,55 @@
 		var width=900;
 		var height=900;
 
-		d3.json("nyc.json", function(json){
+
+		//clock code is inspired from http://bl.ocks.org/tomgp/6475678
+
+		var radians = 0.0174532925, 
+			clockRadius = 200,
+			hourHandLength = 2*clockRadius/3,
+			minuteHandLength = clockRadius,
+			secondHandLength = clockRadius-12,
+			secondHandBalance = 30,
+			secondTickStart = clockRadius;
+			secondTickLength = -10,
+			hourTickStart = clockRadius,
+			hourTickLength = -18
+			secondLabelRadius = clockRadius + 16;
+			secondLabelYOffset = 5
+			hourLabelRadius = clockRadius - 40
+			hourLabelYOffset = 7;
+
+		var hourScale = d3.scaleLinear()
+			.range([0,330])
+			.domain([0,11]);
+
+		var minuteScale = secondScale = d3.scaleLinear()
+			.range([0,354])
+			.domain([0,59]);
+
+		var handData = [
+			{
+				type:'hour',
+				value:0,
+				length:-hourHandLength,
+				scale:hourScale
+			},
+			{
+				type:'minute',
+				value:0,
+				length:-minuteHandLength,
+				scale:minuteScale
+			},
+			{
+				type:'second',
+				value:0,
+				length:-secondHandLength,
+				scale:secondScale,
+				balance:secondHandBalance
+			}
+		];
+
+		d3.json("manhattan.geojson", function(json){
 
 			projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json)
 			var pathGenerator = d3.geoPath().projection(projection);
@@ -60,7 +158,7 @@
 				PokemonNo: Number(line["pokemonId"]),
 				Latitude: Number(line["latitude"]),
 				Longitude: Number(line["longitude"]),
-				TimeOfDay: Number(line["appearedTimeOfDay"]),
+				TimeOfDay: line["appearedTimeOfDay"],
 				Hour: Number(line["appearedHour"]),
 				Minute: Number(line["appearedMinute"]),
 				City: line["city"],
@@ -86,6 +184,8 @@
 			}
 		};
 
+		var pokemons;
+
 		d3.queue()
 		.defer(d3.csv, "pokemon-images.csv", parseRowImg)
 		.defer(d3.csv, "pokemon-weather-time-nyc.csv", parseRowWeatherTime)
@@ -94,14 +194,33 @@
 			imgData = imgdata;
 			weatherTimeData = weatherdata;
 			statsData = statsdata;
-			showPokemon(imgData, weatherTimeData, statsData);
+			pokemons = dataPoints(imgdata, weatherdata, statsdata);
+			var t = new Date();
+			var currenthr=t.getHours();
+			var currentmin=t.getMinutes();
+			document.getElementById("timeinput").step=1/60;
+			document.getElementById("timeinput").value=currenthr+(currentmin/60);
+			showPokemon(pokemons, t.getHours(), t.getMinutes());
 		});
 
+
+		var hr, min;
+
+		d3.select("#timeinput")
+		.on("input", function() {
+			var time=+this.value;
+			hr=Math.floor(time);
+			min=Math.ceil((time%1)*60);
+			updateData();
+			moveHands();
+			svg.selectAll("image").remove().transition();
+			showPokemon(pokemons, hr, min);
+		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
-				if(data.Latitude<42 && data.Latitude>39 && data.Longitude<-73 && data.Longitude>-74.1){
+				if(data.Latitude<40.79 && data.Latitude>40.77 && data.Longitude<-73 && data.Longitude>-74.1){
 					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
 					var hour=data.Hour;
@@ -144,15 +263,42 @@
 		var pokemon1, pokemon2;
 		var numpokemons=0;
 
-		function showPokemon(imgdata, weatherdata, statsdata) {
-
-			var pokemons = dataPoints(imgdata, weatherdata, statsdata);
+		function showPokemon(pokemons, hour, minute) {
+			var minhr, maxhr, minminute, maxminute;
+			if(minute<15){
+				if(hour==0){
+					minhr=23;
+				}else{
+					minhr=hour-1;
+				}
+				maxhr=hour;
+				minminute=60-(15-minute);
+				maxminute=minute+15;
+			}else if(minute>=15 && minute<45){
+				minhr=hour;
+				minminute=minute-15;
+				maxhr=hour;
+				maxminute=minute+15;
+			}else{
+				if(hour==23){
+					maxhr=0;
+				}else{
+					maxhr=hour+1;
+				}
+				minhr=hour;
+				minminute=minute-15;
+				maxminute=minute-45;
+			}
 
 			svg.selectAll("image")
 			.data(pokemons)
 			.enter().append("image")
+			.filter(function(d){
+				return (d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute);
+				
+			})
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
-			.attr("class", function(d){return d.weather;})
+			.attr("class", function(d){return d.weather+" "+d.timeOfDay;})
 			.attr("x", function(d){return projection(d.coordinate)[0];})
 			.attr("y", function(d){return projection(d.coordinate)[1];})
 			.attr("height", 20)
@@ -175,6 +321,136 @@
 				.on("drag", dragged)
 				.on("end", dragended));
 		}
+
+		function drawClock(){ //create all the clock elements
+			updateData();	//draw them in the correct starting position
+
+			var svgclock=d3.select("#clock");
+
+			var face = svgclock.append('g')
+			.attr('id','clock-face')
+			.attr('transform','translate(' + (clockRadius + 50) + ',' + (clockRadius + 50) + ')');
+
+			//add marks for seconds
+			face.selectAll('.second-tick')
+			.data(d3.range(0,60)).enter()
+				.append('line')
+				.attr('class', 'second-tick')
+				.attr('x1',0)
+				.attr('x2',0)
+				.attr('y1',secondTickStart)
+				.attr('y2',secondTickStart + secondTickLength)
+				.attr('transform',function(d){
+					return 'rotate(' + secondScale(d) + ')';
+				});
+			//and labels
+			face.selectAll('.second-label')
+			.data(d3.range(5,61,5))
+			.enter()
+			.append('text')
+			.attr('class', 'second-label')
+			.attr('text-anchor','middle')
+			.attr('x',function(d){
+				return secondLabelRadius*Math.sin(secondScale(d)*radians);
+			})
+			.attr('y',function(d){
+				return -secondLabelRadius*Math.cos(secondScale(d)*radians) + secondLabelYOffset;
+			})
+			.text(function(d){
+				return d;
+			});
+
+			//and hours
+			face.selectAll('.hour-tick')
+			.data(d3.range(0,12)).enter()
+			.append('line')
+			.attr('class', 'hour-tick')
+			.attr('x1',0)
+			.attr('x2',0)
+			.attr('y1',hourTickStart)
+			.attr('y2',hourTickStart + hourTickLength)
+			.attr('transform',function(d){
+				return 'rotate(' + hourScale(d) + ')';
+			});
+
+			face.selectAll('.hour-label')
+			.data(d3.range(3,13,3))
+			.enter()
+			.append('text')
+			.attr('class', 'hour-label')
+			.attr('text-anchor','middle')
+			.attr('x',function(d){
+				return hourLabelRadius*Math.sin(hourScale(d)*radians);
+			})
+			.attr('y',function(d){
+				return -hourLabelRadius*Math.cos(hourScale(d)*radians) + hourLabelYOffset;
+			})
+			.text(function(d){
+				return d;
+			});
+
+
+			var hands = face.append('g').attr('id','clock-hands');
+
+			face.append('g').attr('id','face-overlay')
+			.append('circle').attr('class','hands-cover')
+			.attr('x',0)
+			.attr('y',0)
+			.attr('r',clockRadius/20)
+			.style("stroke", "black");
+
+			hands.selectAll('line')
+			.data(handData)
+			.enter()
+			.append('line')
+			.attr('class', function(d){
+				return d.type + '-hand';
+			})
+			.attr('x1',0)
+			.attr('y1',function(d){
+				return d.balance ? d.balance : 0;
+			})
+			.attr('x2',0)
+			.attr('y2',function(d){
+				return d.length;
+			})
+			.attr('transform',function(d){
+				return 'rotate('+ d.scale(d.value) +')';
+			})
+			.style("stroke", "black");
+		}
+
+		function moveHands(){
+			d3.select('#clock-hands').selectAll('line')
+			.data(handData)
+			.transition()
+			.attr('transform',function(d){
+				return 'rotate('+ d.scale(d.value) +')';
+			});
+
+		}
+
+		function updateData(){
+			if(hr==null && min==null){
+				var t = new Date();
+				handData[0].value = (t.getHours() % 12) + t.getMinutes()/60 ;
+				handData[1].value = t.getMinutes();
+				handData[2].value = t.getSeconds();
+			}else{
+				var t = new Date();
+				handData[0].value = hr % 12 + min/60;
+				handData[1].value = min;
+				handData[2].value = t.getSeconds();
+			}
+		}
+
+		drawClock();
+
+		setInterval(function(){
+			updateData();
+			moveHands();
+		}, 1000);
+
 
 		function showBio(d){
 			svg.append("rect")
@@ -239,6 +515,35 @@
 			d3.select("#speed").remove();
 			d3.select("#total").remove();
 		}
+
+		function morning_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".morning").style("opacity", 0.6);
+		}
+
+		function afternoon_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".afternoon").style("opacity", 0.6);
+		}
+
+		function evening_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".evening").style("opacity", 0.6);
+		}
+
+		function night_clicked(){
+			svg.selectAll("image").style("opacity", 0);
+			svg.selectAll(".night").style("opacity", 0.6);
+		}
+
+		d3.select("#morning").on("click", morning_clicked);
+		d3.select("#afternoon").on("click", afternoon_clicked);
+		d3.select("#evening").on("click", evening_clicked);
+		d3.select("#night").on("click", night_clicked);
+
+		
+
+		
 
 		function clear_clicked(){
 			svg.selectAll("image").style("opacity", 0);
