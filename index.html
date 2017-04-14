@@ -63,6 +63,8 @@
 <body>
 	<svg id="map" height="810" width="900">
 		<rect id="gym" x="740" y="650" height="150" width="150" style="fill:none; stroke-width:3; stroke:black"/></div>
+		<text id="zoomin" x="870" y="600" style="text-anchor: middle; font-size: 20; font-weight:bold">+</text>
+		<text id="zoomout" x="870" y="630" style="text-anchor: middle; font-size: 20; font-weight:bold">-</text>
 	</svg><br>
 	<input type="range" id="timeinput" min=0 max=24 style="width:500px"/><br>
 	<svg id="clock" height="500" width="500"></svg>
@@ -134,18 +136,142 @@
 			}
 		];
 
-		d3.json("manhattan.geojson", function(json){
+		var hr, min;
 
-			projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json)
-			var pathGenerator = d3.geoPath().projection(projection);
+		var currentzoom=0;
+		var zoomed=false;
+		var translation=[0,0];
+		var translated=false;
 
-			svg.selectAll("path")
-			.data(json.features)
-			.enter()
-			.append("path")
-			.attr("d", pathGenerator);
+		loadMap(currentzoom, translation);
 
-		});
+		//reference: http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
+		d3.selection.prototype.moveToBack = function() {  
+	        return this.each(function() { 
+	            var firstChild = this.parentNode.firstChild; 
+	            if (firstChild) { 
+	                this.parentNode.insertBefore(this, firstChild); 
+	            } 
+	        });
+	    };
+
+		function loadMap(currentzoom, translation){
+
+			if(hr==null && min==null){
+				var t = new Date();
+				hr=t.getHours();
+				min=t.getMinutes();
+			}
+
+			d3.json("manhattan.geojson", function(json){
+				if(!zoomed){
+					projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
+				}else{
+					if(currentzoom==0){
+						projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}else if(currentzoom==1){
+						projection = d3.geoMercator().fitExtent([[-500, -400], [1280, 1200]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}else if(currentzoom==2){
+						projection = d3.geoMercator().fitExtent([[-1150, -800], [1780, 1700]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}else if(currentzoom==3){
+						projection = d3.geoMercator().fitExtent([[-1900, -1900], [2480, 2500]], json);
+						svg.selectAll("image").remove();
+						showPokemon(pokemons, hr, min);
+					}
+				}
+
+				var pathGenerator = d3.geoPath().projection(projection);
+
+				svg.selectAll("path").remove();
+
+				svg.selectAll("path")
+				.data(json.features)
+				.enter()
+				.append("path")
+				.attr("d", pathGenerator)
+				.moveToBack();
+
+				if(translated){
+					svg.selectAll("path").transition()
+					.attr("transform", "translate(" + translation[0] + ", " + translation[1] + ")");
+					
+				}
+
+			});
+		}
+
+		d3.select("#zoomin")
+		.on("mouseover", function(){
+				this.setAttribute("cursor", "pointer");
+			})
+		.on("click", zoomIn);
+
+		d3.select("#zoomout")
+		.on("mouseover", function(){
+				this.setAttribute("cursor", "pointer");
+			})
+		.on("click", zoomOut);
+
+		function zoomIn(){
+			translation=[0,0];
+			translated=false;
+			if(currentzoom<3){
+				zoomed=true;
+				currentzoom++;
+				loadMap(currentzoom);
+			}else{
+				currentzoom=3;
+			}
+		}
+
+		function zoomOut(){
+			translation=[0,0];
+			translated=false;
+			if(currentzoom>0){
+				zoomed=true;
+				currentzoom--;
+				loadMap(currentzoom);
+			}else{
+				currentzoom=0;
+			}
+		}
+
+
+		d3.select("#map")
+		.call(d3.drag()
+				.on("start", dragstartedmap)
+				.on("drag", draggedmap)
+				.on("end", dragendedmap));
+
+		var startingX=0, startingY=0;
+
+		function dragstartedmap(d) {
+			this.setAttribute("cursor", "move");
+			startingX=d3.event.x;
+			startingY=d3.event.y;
+		}
+
+		function draggedmap(d) {
+			if(currentzoom==0){
+				translated=false;
+			}else{
+				translated=true;
+			}
+			var currentX=d3.event.x;
+			var currentY=d3.event.y;
+			translation=[currentX-startingX, currentY-startingY]
+			loadMap(currentzoom, translation);
+		}
+
+		function dragendedmap(d) {
+			this.setAttribute("cursor", "default");
+		}
 
 		var parseRowImg = function(line) {
 			return{
@@ -205,8 +331,6 @@
 			showPokemon(pokemons, t.getHours(), t.getMinutes());
 		});
 
-
-		var hr, min;
 
 		d3.select("#timeinput")
 		.on("input", function() {
