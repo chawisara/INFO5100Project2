@@ -4,30 +4,31 @@
 <title>INFO 5100: Project 2 - Interactive Web Pages</title>
 <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 <style>
-	body {font-family: "Muli", sans-serif; background-color: #FFD707; width:1200; height:1000;}
+	body {font-family: "Muli", sans-serif; background-color: #FFD707;   width: 100%;
+    height: 100%;}
 	/*svg {border: solid #ccc 1px; }*/
 	path { fill: #0D46A3; opacity: 0.85;stroke: white; stroke-width: 1px;}
-	button { background-color: #FFD707; border: none;}
+	button { background-color: transparent; border: none;}
 	#weatherintro {
 		position: absolute;
-		left: 950px;
-		top: 50px;
+		left: 74%;
+		top: 7%;
 		font-size: 14px;
 		font-family: Georgia;
 		color: #3664AD;
 	}
 	#timeintro {
 		position: absolute;
-		left: 950px;
-		top: 180px;
+		left: 74%;
+		top: 25%;
 		font-size: 14px;
 		font-family: Georgia;
 		color: #3664AD;
 	}
 	#buttons {
 		position: absolute;
-		left: 950px;
-		top: 100px;
+		left: 74%;
+		top: 13%;
 	}
 
 	#logo {
@@ -46,17 +47,17 @@
 	}
 	#battleintro {
 		position: absolute;
-		left: 950px;
-		top: 360px;
+		left: 74%;
+		top: 58%;
 		font-size: 13px;
 		font-family: Georgia;
 		color: #3664AD;
 	}
 	#map {
 		position: absolute;;
-		left:70px;
+		left:1%;
 	}
-	
+
 
 	#rim {
 		fill: none;
@@ -80,45 +81,90 @@
 
 	.hands-cover{
 		stroke-width:3;
-		fill:#fff;
+		fill:#3664AD;
 	}
 
 	.second-tick{
-		stroke:black;
+		stroke:#3664AD;
 		stroke-width:3;
 		fill:#000;
 	}
 
 	.hour-tick{
-		stroke:black;
+		stroke:#3664AD;
 		stroke-width:8;
 	}
 
 	.second-label{
 		font-size: 12px;
+		color: #3664AD
 	}
 
 	.hour-label{
 		font-size: 24px;
+		color: #3664AD;
 	}
 
 	#clock{
 		position: absolute;
-		top:225;
-		left:980;
+		top:12%;
+		left:60%;
 	}
 
 	#timeinput{
 		position: absolute;
-		top:215;
-		left:960;
+		top:30%;
+		left:74%;
 	}
 
-	#vs{
-		position: absolute;
-		left:1040px;
-		top:415px;
-	}
+#vs{
+	position: absolute;
+	left:80%;
+	top:65%;
+}
+
+#gymsvg {
+	position: absolute;
+	left:74%;
+	top:63%;
+}
+
+#zoomin {
+	position: absolute;
+	left:10%;
+	top:30%;
+}
+#zoomout {
+	position: absolute;
+	left:12%;
+	top:30%;
+}
+
+input[type=range]{
+	 -webkit-appearance: none;
+ }
+
+ input[type=range]::-webkit-slider-runnable-track {
+	 width: 300px;
+	 height: 3px;
+	 background: #ddd;
+	 border: none;
+	 border-radius: 3px;
+ }
+
+ input[type=range]::-webkit-slider-thumb {
+	 -webkit-appearance: none;
+	 border: none;
+	 height: 16px;
+	 width: 16px;
+	 border-radius: 50%;
+	 background: #C96767;
+	 margin-top: -6px;
+ }
+
+ input[type=range]:focus {
+	 outline: none;
+ }
 
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -129,22 +175,22 @@
 
 <body>
 	<svg id="map" height="810" width="1200">
-		<text id="zoomin" x="800" y="500" style="text-anchor: middle; font-size: 20; font-weight:bold">+</text>
-		<text id="zoomout" x="800" y="520" style="text-anchor: middle; font-size: 20; font-weight:bold">-</text>
+		<img id="zoomin"  src="zoomin.png" alt="zoomin" width="20" height="20">
+		<img id="zoomout" src="zoomout.png" alt="zoomout" width="20" height="20">
 		<img id="logo" src="Pokemon-logo.png" alt="logo" height="80" width="208">
-		<p id="intro">This interactive web shows the distribution of <br>Pokemons in New
-		York City area in PokemonGo. <p>
+		<p id="intro">This interactive web shows the distribution of <br>Pokemons in New York Area in PokemonGo. <p>
 	</svg>
 	<audio id="fireaudio" src="fire.mp3"></audio>
 	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
-	<svg id="clock" height="140" width="140" transform="scale(0.3)"></svg>
+	<svg id="clock" height="500" width="500" transform="scale(0.3)"></svg>
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Let them battle!</p>
-	<svg width="1400" height="1000">
-		<rect id="gym" width="250" height="120" x="945" y="350" style="fill:white;stroke-width:1;stroke:#3664AD;" />
-		<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
-	</svg>
+			<svg id="gymsvg" width="400" height="130">
+		  <rect id="gym" width="250" height="130" style="fill:transparent;stroke-width:2;stroke:#3664AD" />
+			<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
+		</svg>
+
 	<div id="buttons">
 		<button id="clear"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
 		<button id="cloudy"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
@@ -209,19 +255,19 @@
 		];
 
 		var hr, min;
-        var backgroundColor = d3.scaleSequential().domain([24,0])
-            .interpolator(d3.interpolateInferno);
+        var backgroundColor = d3.scaleLinear().domain([24,12,0])
+            .interpolate(d3.interpolateRgb).range(["black", "#FFD707","black"]);
 		var currentzoom=0;
 		var zoomed=false;
-		
+
 		loadMap(currentzoom);
 
 		//reference: http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
-		d3.selection.prototype.moveToBack = function() {  
-	        return this.each(function() { 
-	            var firstChild = this.parentNode.firstChild; 
-	            if (firstChild) { 
-	                this.parentNode.insertBefore(this, firstChild); 
+		d3.selection.prototype.moveToBack = function() {
+	        return this.each(function() {
+	            var firstChild = this.parentNode.firstChild;
+	            if (firstChild) {
+	                this.parentNode.insertBefore(this, firstChild);
 	            }
 	        });
 	    };
@@ -234,7 +280,7 @@
 				min=t.getMinutes();
 			}
 
-			d3.json("manhattan.geojson", function(json){
+			d3.json("nyc.json", function(json){
 
 				if(!zoomed){
 					projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
@@ -337,7 +383,7 @@
 				svg.selectAll("path").attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 				svg.selectAll("image").attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 			}
-			
+
 		}
 
 		function dragendedmap(d) {
@@ -494,8 +540,8 @@
 
 
 			svg.selectAll("image")
-			.data(pokemons.filter(function(d) { 
-				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather; 
+			.data(pokemons.filter(function(d) {
+				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
 			}))
 			.enter().append("image")
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
