@@ -213,13 +213,7 @@
             .interpolator(d3.interpolateInferno);
 		var currentzoom=0;
 		var zoomed=false;
-		var translation=[0,0];
-		var translated=false;
-		var currentposition=[0,0];
-		var currentX=0;
-		var currentY=0;
-		var x=0, y=0;
-
+		
 		loadMap(currentzoom);
 
 		//reference: http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
@@ -242,28 +236,25 @@
 
 			d3.json("manhattan.geojson", function(json){
 
-				x=currentX+translation[0];
-				y=currentY+translation[1];
-
 				if(!zoomed){
 					projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
 				}else{
 					if(currentzoom==0){
 						projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
 						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min, x, y);
+						showPokemon(pokemons, hr, min);
 					}else if(currentzoom==1){
 						projection = d3.geoMercator().fitExtent([[-500, -400], [1280, 1200]], json);
 						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min, x, y);
+						showPokemon(pokemons, hr, min);
 					}else if(currentzoom==2){
 						projection = d3.geoMercator().fitExtent([[-1150, -800], [1780, 1700]], json);
 						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min, x, y);
+						showPokemon(pokemons, hr, min);
 					}else if(currentzoom==3){
 						projection = d3.geoMercator().fitExtent([[-1900, -1900], [2480, 2500]], json);
 						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min, x, y);
+						showPokemon(pokemons, hr, min);
 					}
 				}
 
@@ -277,8 +268,6 @@
 				.append("path")
 				.attr("d", pathGenerator)
 				.moveToBack();
-
-				svg.selectAll("path").attr("transform", "translate(" + x + ", " + y + ")");
 
 			});
 		}
@@ -296,8 +285,8 @@
 		.on("click", zoomOut);
 
 		function zoomIn(){
-			translation=[0,0];
-			currentposition=[0,0];
+			currenttranslation=[0,0];
+			previoustranslation=[0,0];
 			if(currentzoom<3){
 				zoomed=true;
 				currentzoom++;
@@ -308,8 +297,8 @@
 		}
 
 		function zoomOut(){
-			translation=[0,0];
-			currentposition=[0,0];
+			currenttranslation=[0,0];
+			previoustranslation=[0,0];
 			if(currentzoom>0){
 				zoomed=true;
 				currentzoom--;
@@ -326,32 +315,34 @@
 				.on("end", dragendedmap));
 
 		var startingX=0, startingY=0;
+		var coordinates=[];
+		var newtranslation=[0,0];
+		var currenttranslation=[0,0];
+		var previoustranslation=[0,0];
 
 		function dragstartedmap(d) {
-			currentposition=[0,0];
+			d3.event.sourceEvent.stopPropagation();
 			this.setAttribute("cursor", "move");
-			startingX=d3.event.x;
-			startingY=d3.event.y;
+			coordinates = d3.mouse(this);
+			startingX = coordinates[0];
+			startingY = coordinates[1];
 		}
 
 		function draggedmap(d) {
-			if(currentzoom==0){
-				translated=false;
-			}else{
-				translated=true;
+			if(currentzoom>0){
+				coordinates = d3.mouse(this);
+				newtranslation=[coordinates[0]-startingX, coordinates[1]-startingY]
+				currenttranslation[0]=newtranslation[0]+previoustranslation[0];
+				currenttranslation[1]=newtranslation[1]+previoustranslation[1];
+				svg.selectAll("path").attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
+				svg.selectAll("image").attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 			}
-			var currentX=d3.event.x;
-			var currentY=d3.event.y;
-			translation=[currentX-startingX, currentY-startingY]
-			currentposition[0]+=translation[0]/15;
-			currentposition[1]+=translation[1]/15;
-			loadMap(currentzoom);
+			
 		}
 
 		function dragendedmap(d) {
 			this.setAttribute("cursor", "default");
-			currentX=currentposition[0];
-			currentY=currentposition[1];
+			previoustranslation=[currenttranslation[0], currenttranslation[1]];
 		}
 
 		var parseRowImg = function(line) {
@@ -409,7 +400,7 @@
 			var currentmin=t.getMinutes();
 			document.getElementById("timeinput").step=1/60;
 			document.getElementById("timeinput").value=currenthr+(currentmin/60);
-			showPokemon(pokemons, t.getHours(), t.getMinutes(), x, y);
+			showPokemon(pokemons, t.getHours(), t.getMinutes());
 		});
 
 		d3.select("#timeinput")
@@ -420,7 +411,7 @@
 			updateData();
 			moveHands();
 			svg.selectAll("image").remove().transition();
-			showPokemon(pokemons, hr, min, x, y);
+			showPokemon(pokemons, hr, min);
             d3.select("body").style("background-color", backgroundColor(hr));
             svg.style("background-color", backgroundColor(hr));
 		});
@@ -473,7 +464,7 @@
 
 		var currentweather="Clear";
 
-		function showPokemon(pokemons, hour, minute, x, y) {
+		function showPokemon(pokemons, hour, minute) {
 
 			var minhr, maxhr, minminute, maxminute;
 			if(minute<15){
@@ -503,11 +494,10 @@
 
 
 			svg.selectAll("image")
-			.data(pokemons)
+			.data(pokemons.filter(function(d) { 
+				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather; 
+			}))
 			.enter().append("image")
-			.filter(function(d){
-				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
-			})
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
 			.attr("class", function(d){return d.weather+" "+d.timeOfDay;})
 			.attr("x", function(d){return projection(d.coordinate)[0];})
@@ -517,7 +507,7 @@
 			.attr("href", function(d){return d.imgURL;})
 			.classed("draggable", "true")
 			.attr("opacity", 0.6)
-			.attr("transform", "translate(" + x + ", " + y + ")")
+			//.attr("transform", "translate(" + x + ", " + y + ")")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
 				this.setAttribute("cursor", "pointer");
@@ -802,10 +792,12 @@
 		}
 
 		function dragged(d) {
-			d3.select(this).attr("x", d3.event.x).attr("y", d3.event.y);
-			d3.select(this).attr("opacity", 1)
-			d3.select(this).attr("width", "60")
-			d3.select(this).attr("height", "60");
+			d3.select(this)
+			.attr("transform", "translate(0,0)")
+			.attr("x", d3.event.x).attr("y", d3.event.y)
+			.attr("opacity", 1)
+			.attr("width", "60")
+			.attr("height", "60");
 		}
 
 		function dragended(d) {
@@ -817,7 +809,8 @@
 			d3.select("#dragtext").remove();
 
 			d3.select(this).attr("width", "20")
-			d3.select(this).attr("height", "20");
+			.attr("height", "20")
+			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 
 			if(!(d3.event.x>=880 && d3.event.y>=400)){
 				if(pokemon1==d){
