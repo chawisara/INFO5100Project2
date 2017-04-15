@@ -519,7 +519,9 @@
 				hideBio(d);
 			})
 			.call(d3.drag()
-				.on("start", dragstarted)
+				.on("start", function(d){
+					hideBio(d);
+					dragstarted(d);})
 				.on("drag", dragged)
 				.on("end", dragended));
 		}
@@ -656,72 +658,70 @@
 		function showBio(d){
 			svg.append("svg:image")
 			.attr("id","bio")
-			.attr("x",projection(d.coordinate)[0]-300)
-			.attr("y", projection(d.coordinate)[1])
-			// .attr("height", 200)
-			// .attr("width", 150)
+			.attr("x",d3.event.clientX-320)
+			.attr("y", d3.event.clientY)
 			.attr("href", "cardback.png");
 
 			svg.append("text")
 			.attr("id","name")
-			.attr("x",projection(d.coordinate)[0]-300+8)
-			.attr("y",projection(d.coordinate)[1]+26)
+			.attr("x",d3.event.clientX-320+8)
+			.attr("y",d3.event.clientY+26)
 			.text("Name: " + d.name)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
 			svg.append("text")
 			.attr("id","type1")
-			.attr("x",projection(d.coordinate)[0]-300+8)
-			.attr("y",projection(d.coordinate)[1]+44)
+			.attr("x",d3.event.clientX-320+8)
+			.attr("y",d3.event.clientY+44)
 			.text("Type1: " + d.type1)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
 			svg.append("text")
 			.attr("id","type2")
-			.attr("x",projection(d.coordinate)[0]-300+8)
-			.attr("y",projection(d.coordinate)[1]+58+4)
+			.attr("x",d3.event.clientX-320+8)
+			.attr("y",d3.event.clientY+58+4)
 			.text("Type2: " + d.type2)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
 			svg.append("text")
 			.attr("id","attack")
-			.attr("x",projection(d.coordinate)[0]-300+8)
-			.attr("y",projection(d.coordinate)[1]+76+4)
+			.attr("x",d3.event.clientX-320+8)
+			.attr("y",d3.event.clientY+76+4)
 			.text("Attack: " + d.attack)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
 			svg.append("text")
 			.attr("id","defense")
-			.attr("x",projection(d.coordinate)[0]-300+8)
-			.attr("y",projection(d.coordinate)[1]+94+4)
+			.attr("x",d3.event.clientX-320+8)
+			.attr("y",d3.event.clientY+94+4)
 			.text("Defense: " + d.defense)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
 			svg.append("text")
 			.attr("id","speed")
-			.attr("x",projection(d.coordinate)[0]-300+8)
-			.attr("y",projection(d.coordinate)[1]+112+4)
+			.attr("x",d3.event.clientX-320+8)
+			.attr("y",d3.event.clientY+112+4)
 			.text("speed: " + d.speed)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
 			svg.append("text")
 			 .attr("id","total")
-			 .attr("x",projection(d.coordinate)[0]-300+8)
-			 .attr("y",projection(d.coordinate)[1]+130+6)
+			 .attr("x",d3.event.clientX-320+8)
+			 .attr("y",d3.event.clientY+130+6)
 			 .text("Total Power: " + d.total)
 			 .attr("font-family","Georgia")
 			 .attr("font-size","14px");
 
 		 svg.append("svg:image")
 		    .attr("id","bigimg")
-		    .attr("x",projection(d.coordinate)[0]-143)
-		    .attr("y", projection(d.coordinate)[1]-6)
+		    .attr("x",d3.event.clientX-163)
+		    .attr("y", d3.event.clientY-6)
 		 .attr("height", 150)
 		 .attr("width", 90)
 		    .attr("xlink:href", d.imgURL);
