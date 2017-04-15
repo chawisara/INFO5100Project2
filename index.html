@@ -207,7 +207,8 @@
 		];
 
 		var hr, min;
-
+        var backgroundColor = d3.scaleSequential().domain([24,0])
+            .interpolator(d3.interpolateInferno);
 		var currentzoom=0;
 		var zoomed=false;
 		var translation=[0,0];
@@ -417,7 +418,8 @@
 			updateData();
 			moveHands();
 			svg.selectAll("image").remove().transition();
-			showPokemon(pokemons, hr, min, x, y);
+            d3.select("body").style("background-color", backgroundColor(hr));
+            svg.style("background-color", backgroundColor(hr));
 		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
