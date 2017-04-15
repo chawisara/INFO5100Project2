@@ -507,7 +507,7 @@
 			.attr("href", function(d){return d.imgURL;})
 			.classed("draggable", "true")
 			.attr("opacity", 0.6)
-			//.attr("transform", "translate(" + x + ", " + y + ")")
+			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
 				this.setAttribute("cursor", "pointer");
@@ -828,9 +828,11 @@
 				numpokemons++;
 				if(numpokemons==1){
 					pokemon1=d;
-					d3.select(this).attr("opacity", 1);
-					d3.select(this).attr("width", "60");
-					d3.select(this).attr("height", "60");
+					d3.select(this)
+					.attr("transform", "translate(0,0")
+					.attr("opacity", 1)
+					.attr("width", "60")
+					.attr("height", "60");
 				}else if(numpokemons==2){
 					numpokemons=0;
 					pokemon2=d;
