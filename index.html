@@ -56,67 +56,69 @@
 		position: absolute;;
 		left:70px;
 	}
- #vs{
-	 position: absolute;
-	 left:1040px;
-	 top:415px;
- }
+	
 
- #rim {
-	 fill: none;
-	 stroke: #999;
-	 stroke-width: 3px;
- }
+	#rim {
+		fill: none;
+		stroke: #999;
+		stroke-width: 3px;
+	}
 
- .second-hand{
-	 stroke-width:3;
- }
+	.second-hand{
+		stroke-width:3;
+	}
 
- .minute-hand{
-	 stroke-width:8;
-	 stroke-linecap:round;
- }
+	.minute-hand{
+		stroke-width:8;
+		stroke-linecap:round;
+	}
 
- .hour-hand{
-	 stroke-width:12;
-	 stroke-linecap:round;
- }
+	.hour-hand{
+		stroke-width:12;
+		stroke-linecap:round;
+	}
 
- .hands-cover{
-	 stroke-width:3;
-	 fill:#fff;
- }
+	.hands-cover{
+		stroke-width:3;
+		fill:#fff;
+	}
 
- .second-tick{
-	 stroke:black;
-	 stroke-width:3;
-	 fill:#000;
- }
+	.second-tick{
+		stroke:black;
+		stroke-width:3;
+		fill:#000;
+	}
 
- .hour-tick{
-	 stroke:black;
-	 stroke-width:8;
- }
+	.hour-tick{
+		stroke:black;
+		stroke-width:8;
+	}
 
- .second-label{
-	 font-size: 12px;
- }
+	.second-label{
+		font-size: 12px;
+	}
 
- .hour-label{
-	 font-size: 24px;
- }
+	.hour-label{
+		font-size: 24px;
+	}
 
- #clock{
-	position: absolute;
-	top:225;
-	left:980;
- }
+	#clock{
+		position: absolute;
+		top:225;
+		left:980;
+	}
 
- #timeinput{
- 	position: absolute;
-	top:215;
-	left:960;
- }
+	#timeinput{
+		position: absolute;
+		top:215;
+		left:960;
+	}
+
+	#vs{
+		position: absolute;
+		left:1040px;
+		top:415px;
+	}
 
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -140,7 +142,7 @@
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Let them battle!</p>
 	<svg width="1400" height="1000">
-	  <rect id="gym" width="250" height="120" x="950" y="360" style="fill:white;stroke-width:1;stroke:#3664AD" />
+		<rect id="gym" width="250" height="120" x="945" y="350" style="fill:white;stroke-width:1;stroke:#3664AD;" />
 		<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
 	</svg>
 	<div id="buttons">
@@ -365,7 +367,7 @@
 				PokemonNo: Number(line["pokemonId"]),
 				Latitude: Number(line["latitude"]),
 				Longitude: Number(line["longitude"]),
-				TimeOfDay: Number(line["appearedTimeOfDay"]),
+				TimeOfDay: line["appearedTimeOfDay"],
 				Hour: Number(line["appearedHour"]),
 				Minute: Number(line["appearedMinute"]),
 				City: line["city"],
@@ -418,6 +420,7 @@
 			updateData();
 			moveHands();
 			svg.selectAll("image").remove().transition();
+			showPokemon(pokemons, hr, min, x, y);
             d3.select("body").style("background-color", backgroundColor(hr));
             svg.style("background-color", backgroundColor(hr));
 		});
