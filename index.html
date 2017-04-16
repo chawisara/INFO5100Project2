@@ -4,30 +4,30 @@
 <title>INFO 5100: Project 2 - Interactive Web Pages</title>
 <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 <style>
-	body {font-family: "Muli", sans-serif; background-color: #FFD707;}
+	body { font-family: "Muli", sans-serif; background-color: #FFD707;}
 	/*svg {border: solid #ccc 1px; }*/
 	path { fill: #0D46A3; opacity: 0.85;stroke: white; stroke-width: 1px;}
 	button { background-color: transparent; border: none;}
 	#weatherintro {
 		position: absolute;
 		left: 74%;
-		top: 7%;
+		top: 9%;
 		font-size: 14px;
 		font-family: Georgia;
-		color: #3664AD;
+		color: white;
 	}
 	#timeintro {
 		position: absolute;
 		left: 74%;
-		top: 25%;
+		top: 27%;
 		font-size: 14px;
 		font-family: Georgia;
-		color: #3664AD;
+		color: white;
 	}
 	#buttons {
 		position: absolute;
 		left: 74%;
-		top: 13%;
+		top: 15%;
 	}
 
 	#logo {
@@ -47,14 +47,14 @@
 	#battleintro {
 		position: absolute;
 		left: 74%;
-		top: 58%;
-		font-size: 13px;
+		top: 74%;
+		font-size: 14px;
 		font-family: Georgia;
-		color: #3664AD;
+		color: white;
 	}
 	#map {
 		position: absolute;;
-		left:1%;
+		left:-2%;
 	}
 
 
@@ -69,12 +69,13 @@
 	}
 
 	.minute-hand{
-		stroke-width:8;
+		stroke-width:5;
 		stroke-linecap:round;
 	}
 
 	.hour-hand{
-		stroke-width:12;
+		stroke-width:10;
+		stroke: blue;
 		stroke-linecap:round;
 	}
 
@@ -84,48 +85,53 @@
 	}
 
 	.second-tick{
-		stroke:#3664AD;
-		stroke-width:3;
+		stroke:white;
+		opacity:0.5;
+		stroke-width:2.5;
 		fill:#000;
 	}
 
 	.hour-tick{
-		stroke:#3664AD;
-		stroke-width:8;
+		stroke:white;
+		opacity:0.5;
+		stroke-width:4.2;
 	}
 
 	.second-label{
-		font-size: 12px;
-		color: #3664AD
+		font-size: 8px;
+		font-style: white;
+		opacity:0.6;
 	}
 
 	.hour-label{
-		font-size: 24px;
-		color: #3664AD;
+		font-size: 14px;
+		font-style: white;
 	}
 
 	#clock{
 		position: absolute;
-		top:32%;
-		left:75%;
+		top:34%;
+		left:71%;
+		/*transform: scale(0.5);
+		transform-origin: left;*/
 	}
 
 	#timeinput{
 		position: absolute;
-		top:30%;
+		top:33%;
 		left:74%;
 	}
 
 	#vs{
 		position: absolute;
 		left:80%;
-		top:65%;
+		top:80%;
 	}
 
 	#gymsvg {
 		position: absolute;
-		left:74%;
-		top:63%;
+		left:73%;
+		top:78%;
 	}
 
 	#zoomin {
@@ -139,6 +145,19 @@
 		left:165px;
 		top:180px;
 		cursor:pointer;
+	}
+
+	#showall {
+		position: absolute;
+		left:75%;
+		top:3%;
+		font-family: Georgia;
+		font-size: 14px;
+		color:white;
+		stroke-width: 2;
+		padding: 3px 5px;
+    border: 2px solid white;
+		border-radius: 4px;
 	}
 
 input[type=range]{
@@ -159,12 +178,32 @@ input[type=range]{
 	 height: 16px;
 	 width: 16px;
 	 border-radius: 50%;
-	 background: #C96767;
+	 background: #FFD707;
 	 margin-top: -6px;
  }
 
  input[type=range]:focus {
 	 outline: none;
+ }
+
+ #sidebar {
+   width:600px;
+	 height: 900px;
+	 position: absolute;
+	 left: 70%;
+	 top: 0;
+	 background-color: #0D46A3; opacity: 0.85;
+
+ }
+
+ #gym {
+	 fill:white;
+ }
+
+ #divider{
+   position: absolute;
+	 left:70%;
+	 top:73%;
  }
 
 </style>
@@ -175,30 +214,35 @@ input[type=range]{
 </head>
 
 <body>
+
+	<audio id="fireaudio" src="fire.mp3"></audio>
 	<svg id="map" height="810" width="1300">
 		<img id="zoomin"  src="zoomin.png" width="20" height="20" onclick="zoomIn()">
 		<img id="zoomout" src="zoomout.png" width="20" height="20" onclick="zoomOut()">
 		<img id="logo" src="Pokemon-logo.png" alt="logo" height="80" width="208">
 		<p id="intro">This interactive web shows the distribution of <br>Pokemons in New York Area in PokemonGo. <p>
 	</svg>
-	<audio id="fireaudio" src="fire.mp3"></audio>
-	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
-	<svg id="clock" height="200" width="200" transform="scale(0.3)"></svg>
-	<button id="showall" style="position:absolute; left:74%; top:3%;">Show all Pokemons</button>
+	<rect id="sidebar"><rect>
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Let them battle!</p>
-			<svg id="gymsvg" width="250" height="130">
-		  <rect id="gym" width="250" height="130" style="fill:transparent;stroke-width:2;stroke:#3664AD" />
-			<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
-		</svg>
-
+		<svg id="clock" height="500" width="500"></svg>
 	<div id="buttons">
 		<button id="clear"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
 		<button id="cloudy"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
 		<button id="drizzle"><img src="./weathericon/rain1x.png" style="width:50px;height:50px;"></button>
 		<button id="breezy"><img src="./weathericon/snow1x.png" style="width:50px;height:50px;"></button>
 	</div>
+	<svg id="gymsvg" width="400" height="330">
+	<!-- <rect id="gym" width="250" height="130" style="fill:white;stroke-width:2;stroke:#3664AD" /> -->
+	<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
+	</svg>
+
+<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
+  <button id="showall">Show all Pokemons</button>
+	<svg id="divider" height="210" width="500">
+  <line x1="0" y1="0" x2="400" y2="0" style="stroke:#FFD707;stroke-width:6" />
+</svg>
 
 
 	<script>
@@ -212,18 +256,18 @@ input[type=range]{
 
 		////clock code is inspired from http://bl.ocks.org/tomgp/6475678
 		var radians = 0.0174532925,
-			clockRadius = 200,
-			hourHandLength = 2*clockRadius/3,
-			minuteHandLength = clockRadius,
-			secondHandLength = clockRadius-12,
+			clockRadius = 100,
+			hourHandLength = 2*clockRadius/4,
+			minuteHandLength = clockRadius-10,
+			secondHandLength = clockRadius-20,
 			secondHandBalance = 30,
 			secondTickStart = clockRadius;
-			secondTickLength = -10,
+			secondTickLength = -8,
 			hourTickStart = clockRadius,
-			hourTickLength = -18
-			secondLabelRadius = clockRadius + 16;
+			hourTickLength = -12,
+			secondLabelRadius = clockRadius + 13;
 			secondLabelYOffset = 5
-			hourLabelRadius = clockRadius - 40
+			hourLabelRadius = clockRadius - 22,
 			hourLabelYOffset = 7;
 
 		var hourScale = d3.scaleLinear()
@@ -292,9 +336,9 @@ input[type=range]{
 					if(currentzoom==0){
 						projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
 					}else if(currentzoom==1){
-						projection = d3.geoMercator().fitExtent([[-500, -400], [1280, 1200]], json);
+						projection = d3.geoMercator().fitExtent([[-50, -20], [1280, 1200]], json);
 					}else if(currentzoom==2){
-						projection = d3.geoMercator().fitExtent([[-1150, -800], [1780, 1700]], json);
+						projection = d3.geoMercator().fitExtent([[-500, -00], [1780, 1700]], json);
 					}else if(currentzoom==3){
 						projection = d3.geoMercator().fitExtent([[-1900, -1900], [2480, 2500]], json);
 					}
@@ -911,7 +955,7 @@ input[type=range]{
 			.attr("height", "20")
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 
-			if(!(d3.event.x>995 && d3.event.y>=240)){
+			if(!(d3.event.x>895 && d3.event.y>=240)){
 				if(pokemon1==d){
 					numpokemons=0;
 					pokemon1=null;
@@ -960,7 +1004,11 @@ input[type=range]{
 			.attr("y", height/5)
 			.attr("height", 425)
 			.attr("width", 500)
-			.style("fill", "white");
+			.attr("rx",10)
+			.attr("ry",10)
+			.style("fill", "white")
+			.style("stroke","#325C8B")
+			.style("stroke-width",5);
 
 			biopopup.append("image")
 			.attr("id", "fire")
@@ -1134,7 +1182,7 @@ input[type=range]{
 				.attr("font-size","20px");
 			}
 
-			
+
 		}
 
 		function removePopup(){
