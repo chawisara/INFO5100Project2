@@ -274,6 +274,8 @@ input[type=range]{
 	        });
 	    };
 
+	    d3.select("#gymsvg").moveToBack();
+
 		function loadMap(currentzoom){
 
 			if(hr==null && min==null){
@@ -909,7 +911,7 @@ input[type=range]{
 			.attr("height", "20")
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 
-			if(!(d3.event.x>998 && d3.event.y>=235)){
+			if(!(d3.event.x>995 && d3.event.y>=240)){
 				if(pokemon1==d){
 					numpokemons=0;
 					pokemon1=null;
@@ -918,15 +920,15 @@ input[type=range]{
 					pokemon2=null;
 				}
 				d3.select(this)
-				  .attr("x", projection(d.coordinate)[0])
-					.attr("y", projection(d.coordinate)[1])
-					.attr("opacity", 1);
+				.attr("x", projection(d.coordinate)[0])
+				.attr("y", projection(d.coordinate)[1])
+				.attr("opacity", 0.6);
 			}else{
 				numpokemons++;
 				if(numpokemons==1){
 					pokemon1=d;
 					d3.select(this)
-					.attr("transform", "translate(0,0")
+					.attr("transform", "translate(0,0)")
 					.attr("opacity", 1)
 					.attr("width", "60")
 					.attr("height", "60");
