@@ -4,8 +4,7 @@
 <title>INFO 5100: Project 2 - Interactive Web Pages</title>
 <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 <style>
-	body {font-family: "Muli", sans-serif; background-color: #FFD707;   width: 100%;
-    height: 100%;}
+	body {font-family: "Muli", sans-serif; background-color: #FFD707;}
 	/*svg {border: solid #ccc 1px; }*/
 	path { fill: #0D46A3; opacity: 0.85;stroke: white; stroke-width: 1px;}
 	button { background-color: transparent; border: none;}
@@ -107,8 +106,8 @@
 
 	#clock{
 		position: absolute;
-		top:12%;
-		left:60%;
+		top:32%;
+		left:75%;
 	}
 
 	#timeinput{
@@ -117,28 +116,30 @@
 		left:74%;
 	}
 
-#vs{
-	position: absolute;
-	left:80%;
-	top:65%;
-}
+	#vs{
+		position: absolute;
+		left:80%;
+		top:65%;
+	}
 
-#gymsvg {
-	position: absolute;
-	left:74%;
-	top:63%;
-}
+	#gymsvg {
+		position: absolute;
+		left:74%;
+		top:63%;
+	}
 
-#zoomin {
-	position: absolute;
-	left:10%;
-	top:30%;
-}
-#zoomout {
-	position: absolute;
-	left:12%;
-	top:30%;
-}
+	#zoomin {
+		position: absolute;
+		left:140px;
+		top:180px;
+		cursor:pointer;
+	}
+	#zoomout {
+		position: absolute;
+		left:165px;
+		top:180px;
+		cursor:pointer;
+	}
 
 input[type=range]{
 	 -webkit-appearance: none;
@@ -174,19 +175,20 @@ input[type=range]{
 </head>
 
 <body>
-	<svg id="map" height="810" width="1200">
-		<img id="zoomin"  src="zoomin.png" alt="zoomin" width="20" height="20">
-		<img id="zoomout" src="zoomout.png" alt="zoomout" width="20" height="20">
+	<svg id="map" height="810" width="1300">
+		<img id="zoomin"  src="zoomin.png" width="20" height="20" onclick="zoomIn()">
+		<img id="zoomout" src="zoomout.png" width="20" height="20" onclick="zoomOut()">
 		<img id="logo" src="Pokemon-logo.png" alt="logo" height="80" width="208">
 		<p id="intro">This interactive web shows the distribution of <br>Pokemons in New York Area in PokemonGo. <p>
 	</svg>
 	<audio id="fireaudio" src="fire.mp3"></audio>
 	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
-	<svg id="clock" height="500" width="500" transform="scale(0.3)"></svg>
+	<svg id="clock" height="200" width="200" transform="scale(0.3)"></svg>
+	<button id="showall" style="position:absolute; left:74%; top:3%;">Show all Pokemons</button>
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Let them battle!</p>
-			<svg id="gymsvg" width="400" height="130">
+			<svg id="gymsvg" width="250" height="130">
 		  <rect id="gym" width="250" height="130" style="fill:transparent;stroke-width:2;stroke:#3664AD" />
 			<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
 		</svg>
@@ -287,19 +289,18 @@ input[type=range]{
 				}else{
 					if(currentzoom==0){
 						projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
-						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min);
 					}else if(currentzoom==1){
 						projection = d3.geoMercator().fitExtent([[-500, -400], [1280, 1200]], json);
-						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min);
 					}else if(currentzoom==2){
 						projection = d3.geoMercator().fitExtent([[-1150, -800], [1780, 1700]], json);
-						svg.selectAll("image").remove();
-						showPokemon(pokemons, hr, min);
 					}else if(currentzoom==3){
 						projection = d3.geoMercator().fitExtent([[-1900, -1900], [2480, 2500]], json);
-						svg.selectAll("image").remove();
+					}
+
+					svg.selectAll("image").remove();
+					if(allpokemons){
+						showAllPokemons(pokemons);
+					}else{
 						showPokemon(pokemons, hr, min);
 					}
 				}
@@ -318,17 +319,23 @@ input[type=range]{
 			});
 		}
 
-		d3.select("#zoomin")
-		.on("mouseover", function(){
-				this.setAttribute("cursor", "pointer");
-			})
-		.on("click", zoomIn);
+		// d3.select("#zoomin")
+		// .on("mouseover", function(d){
+		// 	this.setAttribute("cursor", "pointer");
+		// })
+		// .on("mouseout", function(d){
+		// 	this.setAttribute("cursor", "default");
+		// })
+		// .on("click", zoomIn);
 
-		d3.select("#zoomout")
-		.on("mouseover", function(){
-				this.setAttribute("cursor", "pointer");
-			})
-		.on("click", zoomOut);
+		// d3.select("#zoomout")
+		// .on("mouseover", function(d){
+		// 	this.setAttribute("cursor", "pointer");
+		// })
+		// .on("mouseout", function(d){
+		// 	this.setAttribute("cursor", "default");
+		// })
+		// .on("click", zoomOut);
 
 		function zoomIn(){
 			currenttranslation=[0,0];
@@ -446,7 +453,12 @@ input[type=range]{
 			var currentmin=t.getMinutes();
 			document.getElementById("timeinput").step=1/60;
 			document.getElementById("timeinput").value=currenthr+(currentmin/60);
-			showPokemon(pokemons, t.getHours(), t.getMinutes());
+			showAllPokemons(pokemons);
+		});
+
+		d3.select("#showall")
+		.on("click", function(){
+			showAllPokemons(pokemons);
 		});
 
 		d3.select("#timeinput")
@@ -457,6 +469,7 @@ input[type=range]{
 			updateData();
 			moveHands();
 			svg.selectAll("image").remove().transition();
+			allpokemons=false;
 			showPokemon(pokemons, hr, min);
             d3.select("body").style("background-color", backgroundColor(hr));
             svg.style("background-color", backgroundColor(hr));
@@ -465,7 +478,7 @@ input[type=range]{
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
-				if(data.Latitude<40.77 && data.Latitude>40.4 && data.Longitude<-73.5 && data.Longitude>-74.1){
+				if((data.Longitude>-74.2 && data.Longitude<-74.05 && data.Latitude<40.6 && data.Latitude>40.5) || (data.Longitude>-74 && data.Longitude<-73.8 && data.Latitude<40.9)){
 					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
 					var hour=data.Hour;
@@ -511,6 +524,7 @@ input[type=range]{
 		var currentweather="Clear";
 
 		function showPokemon(pokemons, hour, minute) {
+			allpokemons=false;
 
 			var minhr, maxhr, minminute, maxminute;
 			if(minute<15){
@@ -543,6 +557,41 @@ input[type=range]{
 			.data(pokemons.filter(function(d) {
 				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
 			}))
+			.enter().append("image")
+			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
+			.attr("class", function(d){return "pokemon "+d.weather+" "+d.timeOfDay;})
+			.attr("x", function(d){return projection(d.coordinate)[0];})
+			.attr("y", function(d){return projection(d.coordinate)[1];})
+			.attr("height", 20)
+			.attr("width", 20)
+			.attr("href", function(d){return d.imgURL;})
+			.classed("draggable", "true")
+			.attr("opacity", 0.6)
+			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")")
+			.on("mouseover", function(d){
+				this.setAttribute("opacity", 1.0);
+				this.setAttribute("cursor", "pointer");
+				showBio(d);
+			})
+			.on("mouseout", function(d){
+				this.setAttribute("opacity", 0.6);
+				this.setAttribute("cursor", "default");
+				hideBio(d);
+			})
+			.call(d3.drag()
+				.on("start", function(d){
+					hideBio(d);
+					dragstarted(d);})
+				.on("drag", dragged)
+				.on("end", dragended));
+		}
+
+		var allpokemons=false;
+
+		function showAllPokemons(pokemons){
+			allpokemons=true;
+			svg.selectAll("image")
+			.data(pokemons)
 			.enter().append("image")
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
 			.attr("class", function(d){return d.weather+" "+d.timeOfDay;})
@@ -702,11 +751,14 @@ input[type=range]{
 		}, 1000);
 
 		function showBio(d){
-			svg.append("svg:image")
+
+			svg.append("image")
 			.attr("id","bio")
 			.attr("x",d3.event.clientX-320)
-			.attr("y", d3.event.clientY)
-			.attr("href", "cardback.png");
+			.attr("y", d3.event.clientY-200)
+			.attr("height", 550)
+			.attr("width", 253)
+			.attr("xlink:href", "cardback.png");
 
 			svg.append("text")
 			.attr("id","name")
@@ -752,7 +804,7 @@ input[type=range]{
 			.attr("id","speed")
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+112+4)
-			.text("speed: " + d.speed)
+			.text("Speed: " + d.speed)
 			.attr("font-family","Georgia")
 			.attr("font-size","14px");
 
@@ -764,13 +816,13 @@ input[type=range]{
 			 .attr("font-family","Georgia")
 			 .attr("font-size","14px");
 
-		 svg.append("svg:image")
-		    .attr("id","bigimg")
-		    .attr("x",d3.event.clientX-163)
-		    .attr("y", d3.event.clientY-6)
-		 .attr("height", 150)
-		 .attr("width", 90)
-		    .attr("xlink:href", d.imgURL);
+			svg.append("image")
+				.attr("id","bigimg")
+				.attr("x",d3.event.clientX-163)
+				.attr("y", d3.event.clientY-6)
+				.attr("height", 150)
+				.attr("width", 90)
+				.attr("href", d.imgURL);
 		}
 
 		function hideBio(d){
@@ -810,12 +862,11 @@ input[type=range]{
 
 		//reference: https://bl.ocks.org/mbostock/22994cc97fefaeede0d861e6815a847e
 		function dragstarted(d) {
-			d3.select(this).raise().classed("active", true)
 			d3.select("#gym").style("stroke", "yellow");
 
 			svg.append("rect")
 			.attr("id","draghighlight")
-			.attr("x", (width/2)-225+60)
+			.attr("x", (width/2)-225+150)
 			.attr("y", 20)
 			.attr("rx", 20)
 			.attr("ry", 20)
@@ -827,7 +878,7 @@ input[type=range]{
 
 			svg.append("text")
 			.attr("id", "dragtext")
-			.attr("x", 60+width/2)
+			.attr("x", 150+width/2)
 			.attr("y", 40)
 			.style("text-anchor","middle")
 			.style("font-family","Muli")
@@ -858,7 +909,7 @@ input[type=range]{
 			.attr("height", "20")
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 
-			if(!(d3.event.x>=880 && d3.event.y>=400)){
+			if(!(d3.event.x>998 && d3.event.y>=235)){
 				if(pokemon1==d){
 					numpokemons=0;
 					pokemon1=null;
@@ -891,56 +942,60 @@ input[type=range]{
 		}
 
 		function showBattle(pokemon1, pokemon2){
-      document.getElementById("fireaudio").play();
+      		document.getElementById("fireaudio").play();
 			document.getElementById("fireaudio").loop=true;
 
-			svg.append("rect")
+			svg.append("g").attr("id", "popup");
+
+			var biopopup = d3.select("#popup");
+
+			var width=1300;
+			var height=810;
+
+			biopopup.append("rect")
 			.attr("id","tempbg")
-			.attr("x", 150)
-			.attr("y", 150)
-			.attr("height", 600)
-			.attr("width", 700)
+			.attr("x", width/5 + 50)
+			.attr("y", height/5)
+			.attr("height", 425)
+			.attr("width", 500)
 			.style("fill", "white");
 
-			svg.append("image")
+			biopopup.append("image")
 			.attr("id", "fire")
-			.attr("x", 400)
-			.attr("y", 150)
+			.attr("x", width/5 + 50 + 130)
+			.attr("y", height/5 - 70)
 			.attr("height", 400)
 			.attr("width", 230)
 			.attr("href", "fire2.gif");
 
-
-			svg.append("image")
-			.attr("id", "pokemon1")
-			.attr("x", 220)
-			.attr("y", 300)
-			.attr("height", 220)
-			.attr("width", 200)
-			.attr("href", function(d){return pokemon1.imgURL;});
-
-			svg.append("image")
-			.attr("id", "pokemon2")
-			.attr("x", 580)
-			.attr("y", 300)
-			.attr("height", 220)
-			.attr("width", 200)
-			.attr("href", function(d){return pokemon2.imgURL;});
-
-
-			svg.append("image")
+			biopopup.append("image")
 			.attr("id", "vss")
-			.attr("x", 450)
-			.attr("y", 300)
-			.attr("height", 150)
-			.attr("width", 100)
+			.attr("x", width/5 + 50 + 215)
+			.attr("y", height/5 + 120)
+			.attr("height", 100)
+			.attr("width", 70)
 			.attr("href", "vs.png");
 
+			biopopup.append("image")
+			.attr("id", "pokemon1")
+			.attr("x", width/5 + 60)
+			.attr("y", height/5 + 60)
+			.attr("height", 200)
+			.attr("width", 180)
+			.attr("href", function(d){return pokemon1.imgURL;});
 
-			svg.append("svg:image")
+			biopopup.append("image")
+			.attr("id", "pokemon2")
+			.attr("x", width/5 + 360)
+			.attr("y", height/5 + 60)
+			.attr("height", 200)
+			.attr("width", 180)
+			.attr("href", function(d){return pokemon2.imgURL;});
+
+			biopopup.append("image")
 			.attr("id", "close")
-			.attr("x", width/5)
-			.attr("y", height/5)
+			.attr("x", width/5+60)
+			.attr("y", height/5+10)
 			.attr("width",30)
 			.attr("height",30)
 			.style("text-anchor","middle")
@@ -949,16 +1004,139 @@ input[type=range]{
 				this.setAttribute("cursor", "pointer");
 			})
 			.on("click", removePopup);
+
+			biopopup.append("text")
+			.attr("id","name1")
+			.attr("x", width/5+150)
+			.attr("y", height/5+60)
+			.text(pokemon1.name)
+			.attr('text-anchor','middle')
+			.attr("font-family","Georgia")
+			.attr("font-size","20px");
+
+			biopopup.append("text")
+			.attr("id","name2")
+			.attr("x", width/5+450)
+			.attr("y", height/5+60)
+			.text(pokemon2.name)
+			.attr('text-anchor','middle')
+			.attr("font-family","Georgia")
+			.attr("font-size","20px");
+
+			biopopup.append("text")
+			.attr("id","type1")
+			.attr("x", width/5+100)
+			.attr("y", height/5+270)
+			.text("Type1: " + pokemon1.type1)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","type1")
+			.attr("x", width/5+400)
+			.attr("y", height/5+270)
+			.text("Type1: " + pokemon2.type1)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","type2")
+			.attr("x", width/5+100)
+			.attr("y", height/5+290)
+			.text("Type2: " + pokemon1.type2)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","type2")
+			.attr("x", width/5+400)
+			.attr("y", height/5+290)
+			.text("Type2: " + pokemon2.type2)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","attack")
+			.attr("x",width/5+100)
+			.attr("y",height/5+310)
+			.text("Attack: " + pokemon1.attack)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","attack")
+			.attr("x",width/5+400)
+			.attr("y",height/5+310)
+			.text("Attack: " + pokemon2.attack)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","defense")
+			.attr("x",width/5+100)
+			.attr("y",height/5+330)
+			.text("Defense: " + pokemon1.defense)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","defense")
+			.attr("x",width/5+400)
+			.attr("y",height/5+330)
+			.text("Defense: " + pokemon2.defense)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","speed")
+			.attr("x",width/5+100)
+			.attr("y",height/5+350)
+			.text("Speed: " + pokemon1.speed)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			biopopup.append("text")
+			.attr("id","speed")
+			.attr("x",width/5+400)
+			.attr("y",height/5+350)
+			.text("Speed: " + pokemon2.speed)
+			.attr("font-family","Georgia")
+			.attr("font-size","14px");
+
+			if(pokemon1.total>pokemon2.total){
+				biopopup.append("text")
+				.attr("id","name2")
+				.attr("x", width/5 + 50 + 250)
+				.attr("y", height/5+385)
+				.text(pokemon1.name+" is more likely to win!")
+				.attr('text-anchor','middle')
+				.attr("font-family","Georgia")
+				.attr("font-size","20px");
+			}else if(pokemon1.total==pokemon2.total){
+				biopopup.append("text")
+				.attr("id","name2")
+				.attr("x", width/5 + 50 + 250)
+				.attr("y", height/5+385)
+				.text("Seems like it's going to be a tie!")
+				.attr('text-anchor','middle')
+				.attr("font-family","Georgia")
+				.attr("font-size","20px");
+			}else{
+				biopopup.append("text")
+				.attr("id","name2")
+				.attr("x", width/5 + 50 + 250)
+				.attr("y", height/5+385)
+				.text(pokemon2.name+" is more likely to win!")
+				.attr('text-anchor','middle')
+				.attr("font-family","Georgia")
+				.attr("font-size","20px");
+			}
+
+			
 		}
 
 		function removePopup(){
-			d3.select("#tempbg").remove();
-			d3.select("#pokemon1").remove();
-			d3.select("#pokemon2").remove();
-			d3.select("#close").remove();
-			d3.select("#makeup").remove();
-			d3.select("#fire").remove();
-			d3.select("#vss").remove();
+			d3.select("#popup").remove();
 			document.getElementById("fireaudio").pause();
 
 		}
