@@ -130,6 +130,65 @@
 		left:74%;
 	}
 
+	/*reference: https://www.w3schools.com/howto/howto_css_switch.asp*/
+	.switch {
+		position: absolute;
+		display: inline-block;
+		width: 35px;
+		height: 20px;
+		top:48%;
+		left:90%;
+	}
+
+	.switch input {display:none;}
+
+	.slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #ccc;
+		-webkit-transition: .4s;
+		transition: .4s;
+	}
+
+	.slider:before {
+		position: absolute;
+		content: "";
+		height: 15px;
+		width: 15px;
+		left: 4px;
+		bottom: 4px;
+		top:2px;
+		background-color: white;
+		-webkit-transition: .4s;
+		transition: .4s;
+	}
+
+	input:checked + .slider {
+		background-color: #2196F3;
+	}
+
+	input:focus + .slider {
+		box-shadow: 0 0 1px #2196F3;
+	}
+
+	input:checked + .slider:before {
+		-webkit-transform: translateX(13px);
+		-ms-transform: translateX(13px);
+		transform: translateX(13px);
+	}
+
+	.slider.round {
+		border-radius: 34px;
+	}
+
+	.slider.round:before {
+		border-radius: 50%;
+	}
+
 	#vs{
 		position: absolute;
 		left:80%;
@@ -232,6 +291,7 @@
 	 #text {
 		 background-color: transparent;
 		 border: none;
+		 color:white;
 	 }
 
 	 #searchbutton {
@@ -291,7 +351,12 @@
 	<circle cx="30" cy="30" r="30"></circle>
 	</svg>
 
-	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
+	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/>
+	<label class="switch">
+		<input type="checkbox" onclick="toggleTime(this)">
+		<div class="slider round"></div>
+	</label>
+	<br>
 	<form id="search" onsubmit="getSearchedName(this); return false;">
 		<input id="text" type="text" name="pokemonsearch" placeholder="Type in a Pokemon name..." width=400>
 		<input id="searchbutton" type="button" value="Search" onclick="getSearchedName(this.form)">
@@ -363,6 +428,22 @@
 		var currentzoom=0;
 		var zoomed=false;
 
+		var pokemons;
+
+		var pokemon1, pokemon2;
+		var numpokemons=0;
+
+		var currentweather="Clear";
+
+		var allpokemons=false;
+		var weatherchange=false;
+		var timechange=false;
+		var timetoggle=false;
+
+		var searching=false;
+		var searchedpokemon="";
+
+
 		loadMap(currentzoom);
 
 		//reference: http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
@@ -380,8 +461,6 @@
 				this.parentNode.appendChild(this);
 			});
 		};
-
-	    d3.select("#gymsvg").moveToBack();
 
 		function loadMap(currentzoom){
 
@@ -407,10 +486,12 @@
 					}
 
 					svg.selectAll("image").remove();
-					if(allpokemons){
+					if(allpokemons){ //show all pokemons; can use weather filter
 						showAllPokemons(pokemons);
-					}else{
+					}else if(timechange){ //show pokemons only available during certain times; can use weather filter
 						showPokemon(pokemons, hr, min);
+					}else if(searching){
+						showSearchedPokemon(pokemons, searchedpokemon);
 					}
 				}
 
@@ -528,7 +609,6 @@
 			}
 		};
 
-		var pokemons;
 
 		d3.queue()
 		.defer(d3.csv, "pokemon-images.csv", parseRowImg)
@@ -552,26 +632,57 @@
 		.on("click", function(){
 			allpokemons=true;
 			weatherchange=false;
+			timechange=false;
 			svg.selectAll("image").remove().transition();
 			showAllPokemons(pokemons);
 		});
 
+		function toggleTime(checkbox){
+			if(checkbox.checked){
+				timetoggle=true;
+				if(hr==null && min==null){
+					var t = new Date();
+					hr=t.getHours();
+					min=t.getMinutes();
+				}
+				svg.selectAll("image").remove();
+				if(searching){
+					showSearchedPokemon(pokemons, searchedpokemon);
+				}else{
+					showPokemon(pokemons, hr, min);
+				}
+			}else{
+				timetoggle=false;
+				if(!allpokemons){
+					if(searching){
+						showSearchedPokemon(pokemons, searchedpokemon);
+					}else{
+						allpokemons=true;
+						showAllPokemons(pokemons);
+					}
+					
+				}
+			}
+		}
+
 		d3.select("#timeinput")
 		.on("input", function() {
-			var time=+this.value;
-			hr=Math.floor(time);
-			min=Math.ceil((time%1)*60);
-			updateData();
-			moveHands();
-			svg.selectAll("image").remove().transition();
-			allpokemons=false;
-			if(searching){
-				showSearchedPokemon(pokemons, searchedpokemon);
-			}else{
-				showPokemon(pokemons, hr, min);
+			if(timetoggle){
+				var time=+this.value;
+				hr=Math.floor(time);
+				min=Math.ceil((time%1)*60);
+				updateData();
+				moveHands();
+				svg.selectAll("image").remove().transition();
+				allpokemons=false;
+				timechange=true;
+				if(searching){
+					showSearchedPokemon(pokemons, searchedpokemon);
+				}else{
+					showPokemon(pokemons, hr, min);
+				}
+				d3.select("body").style("background-color", backgroundColor(hr));
 			}
-            d3.select("body").style("background-color", backgroundColor(hr));
-            // svg.style("background-color", backgroundColor(hr));
 		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
@@ -617,10 +728,6 @@
 			return points;
 		}
 
-		var pokemon1, pokemon2;
-		var numpokemons=0;
-
-		var currentweather="Clear";
 
 		function showPokemon(pokemons, hour, minute) {
 			allpokemons=false;
@@ -654,7 +761,7 @@
 
 			svg.selectAll("image")
 			.data(pokemons.filter(function(d) {
-				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
+				return ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute));
 			}))
 			.enter().append("image")
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
@@ -683,10 +790,13 @@
 					dragstarted(d);})
 				.on("drag", dragged)
 				.on("end", dragended));
-		}
 
-		var allpokemons=false;
-		var weatherchange=false;
+
+			if(weatherchange){
+				svg.selectAll("image").style("opacity", 0);
+				svg.selectAll("."+currentweather).style("opacity", 0.8);
+			}
+		}
 
 		function showAllPokemons(pokemons){
 			allpokemons=true;
@@ -726,9 +836,6 @@
 				svg.selectAll("."+currentweather).style("opacity", 0.8);
 			}
 		}
-
-		var searching=false;
-		var searchedpokemon="";
 
 		function getSearchedName(form){
 			searchedpokemon=form.pokemonsearch.value.toLowerCase();
@@ -776,7 +883,12 @@
 
 			svg.selectAll("image")
 			.data(pokemons.filter(function(d) {
-				return searchedpokemon==d.name.toLowerCase() && ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
+				if(timetoggle){
+					return searchedpokemon==d.name.toLowerCase() && ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute));
+				}else{
+					return searchedpokemon==d.name.toLowerCase();
+				}
+				
 			}))
 			.enter().append("image")
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
@@ -805,6 +917,11 @@
 					dragstarted(d);})
 				.on("drag", dragged)
 				.on("end", dragended));
+
+			if(weatherchange){
+				svg.selectAll("image").style("opacity", 0);
+				svg.selectAll("."+currentweather).style("opacity", 0.8);
+			}
 		}
 
 		function drawClock(){ //create all the clock elements
@@ -1025,28 +1142,72 @@
 
 
 		function clear_clicked(){
-			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Clear").style("opacity", 0.8);
-			currentweather="Clear";
-			weatherchange=true;
+			if(weatherchange && currentweather=="Clear"){
+				weatherchange=false;
+				svg.selectAll("image").style("opacity", 0.8);
+				d3.select("#clear").style("border", "none");
+			}else{
+				svg.selectAll("image").style("opacity", 0);
+				svg.selectAll(".Clear").style("opacity", 0.8);
+				currentweather="Clear";
+				weatherchange=true;
+				d3.select("#clear").style("border", "2px solid white");
+				d3.select("#cloudy").style("border", "none");
+				d3.select("#drizzle").style("border", "none");
+				d3.select("#breezy").style("border", "none");
+			}
+			
 		}
 		function cloudy_clicked(){
-			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Overcast").style("opacity", 0.8);
-			currentweather="Overcast";
-			weatherchange=true;
+			if(weatherchange && currentweather=="Overcast"){
+				weatherchange=false;
+				svg.selectAll("image").style("opacity", 0.8);
+				d3.select("#cloudy").style("border", "none");
+			}else{			
+				svg.selectAll("image").style("opacity", 0);
+				svg.selectAll(".Overcast").style("opacity", 0.8);
+				currentweather="Overcast";
+				weatherchange=true;
+				d3.select("#cloudy").style("border", "2px solid white");
+				d3.select("#clear").style("border", "none");
+				d3.select("#drizzle").style("border", "none");
+				d3.select("#breezy").style("border", "none");
+			}
+
 		}
 		function drizzle_clicked(){
-			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Drizzle").style("opacity", 0.8);
-			currentweather="Drizzle";
-			weatherchange=true;
+			if(weatherchange && currentweather=="Drizzle"){
+				weatherchange=false;
+				svg.selectAll("image").style("opacity", 0.8);
+				d3.select("#drizzle").style("border", "none");
+			}else{			
+				svg.selectAll("image").style("opacity", 0);
+				svg.selectAll(".Drizzle").style("opacity", 0.8);
+				currentweather="Drizzle";
+				weatherchange=true;
+				d3.select("#drizzle").style("border", "2px solid white");
+				d3.select("#clear").style("border", "none");
+				d3.select("#cloudy").style("border", "none");
+				d3.select("#breezy").style("border", "none");
+			}
+			
 		}
 		function breezy_clicked(){
-			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Breezy").style("opacity", 0.8);
-			currentweather="Breezy";
-			weatherchange=true;
+			if(weatherchange && currentweather=="Breezy"){
+				weatherchange=false;
+				svg.selectAll("image").style("opacity", 0.8);
+				d3.select("#breezy").style("border", "none");
+			}else{			
+				svg.selectAll("image").style("opacity", 0);
+				svg.selectAll(".Breezy").style("opacity", 0.8);
+				currentweather="Breezy";
+				weatherchange=true;
+				d3.select("#breezy").style("border", "2px solid white");
+				d3.select("#clear").style("border", "none");
+				d3.select("#cloudy").style("border", "none");
+				d3.select("#drizzle").style("border", "none");
+			}
+			
 		}
 
 		d3.select("#clear").on("click", clear_clicked);
@@ -1090,6 +1251,8 @@
 			.attr("width", "60")
 			.attr("height", "60")
 			.moveToFront();
+
+			hideBio(d);
 		}
 
 		function dragended(d) {
