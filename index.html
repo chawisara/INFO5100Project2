@@ -120,8 +120,13 @@
 		position: absolute;
 		top:50%;
 		left:74%;
+		cursor:pointer;
 		/*transform: scale(0.5);
 		transform-origin: left;*/
+	}
+
+	#clock-face{
+		opacity:0.4;
 	}
 
 	#timeinput{
@@ -131,7 +136,7 @@
 	}
 
 	/*reference: https://www.w3schools.com/howto/howto_css_switch.asp*/
-	.switch {
+/*	.switch {
 		position: absolute;
 		display: inline-block;
 		width: 35px;
@@ -187,7 +192,7 @@
 
 	.slider.round:before {
 		border-radius: 50%;
-	}
+	}*/
 
 	#vs{
 		position: absolute;
@@ -309,12 +314,12 @@
 	 }
 
 
-	 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: white;
-	opacity: 0.6;
-	font-size: 11;
-	font-family: Georgia;
-}
+	::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+		color: white;
+		opacity: 0.6;
+		font-size: 11;
+		font-family: Georgia;
+	}
 
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -338,24 +343,27 @@
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Drag two pokemons here and let them battle!</p>
-		<svg id="clock" height="500" width="500"></svg>
+		<svg id="clock" height="200" width="200" onclick="toggleTime()" onmouseover="showClockText()" onmouseout="hideClockText()">
+			<text id="clocktext1" x="49" y="90" style="fill:#686868;stroke:white; font-size:12px; opacity:0">Click on me to turn on</text>			
+			<text id="clocktext2" x="70" y="110" style="fill:#686868; stroke:white; font-size:12px; opacity:0">the time filter</text>
+		</svg>
 	<div id="buttons">
-		<button id="clear"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
-		<button id="cloudy"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
-		<button id="drizzle"><img src="./weathericon/rain1x.png" style="width:50px;height:50px;"></button>
-		<button id="breezy"><img src="./weathericon/snow1x.png" style="width:50px;height:50px;"></button>
+		<button id="clear" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
+		<button id="cloudy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
+		<button id="drizzle" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/rain1x.png" style="width:50px;height:50px;"></button>
+		<button id="breezy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/snow1x.png" style="width:50px;height:50px;"></button>
 	</div>
 	<svg id="gymsvg" width="400" height="330">
 	<!-- <rect id="gym" width="250" height="130" style="fill:white;stroke-width:2;stroke:#3664AD" /> -->
-	<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
+	<img id="vs" src="vs.png" alt="vs" height="100" width="80">
 	<circle cx="30" cy="30" r="30"></circle>
 	</svg>
 
-	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/>
-	<label class="switch">
-		<input type="checkbox" onclick="toggleTime(this)">
+	<input type="range" id="timeinput" min=0 max=24 style="width:170px" disabled="true"/>
+	<!-- <label class="switch">
+		<input type="checkbox" id="timetoggle" onclick="toggleTime(this)">
 		<div class="slider round"></div>
-	</label>
+	</label> -->
 	<br>
 	<form id="search" onsubmit="getSearchedName(this); return false;">
 		<input id="text" type="text" name="pokemonsearch" placeholder="Type in a Pokemon name..." width=400>
@@ -634,12 +642,35 @@
 			weatherchange=false;
 			timechange=false;
 			svg.selectAll("image").remove().transition();
+			d3.selectAll("#clear").style("opacity", 0.6);
+			d3.selectAll("#cloudy").style("opacity", 0.6);
+			d3.selectAll("#drizzle").style("opacity", 0.6);
+			d3.selectAll("#breezy").style("opacity", 0.6);
+
+			// d3.select("#timetoggle").attr("checked", false);
+			// d3.select(".slider").attr("before", false);
+
 			showAllPokemons(pokemons);
 		});
 
-		function toggleTime(checkbox){
-			if(checkbox.checked){
+		function showClockText(){
+			if(!timetoggle){
+				d3.select("#clocktext1").style("opacity", 1);
+				d3.select("#clocktext2").style("opacity", 1);
+			}
+		}
+
+		function hideClockText(){
+			d3.select("#clocktext1").style("opacity", 0);
+			d3.select("#clocktext2").style("opacity", 0);
+		}
+
+		function toggleTime(){
+			if(!timetoggle){
 				timetoggle=true;
+				d3.select("#clock-face").style("opacity", 1);
+				d3.select("#timeinput").attr("disabled", null);
+
 				if(hr==null && min==null){
 					var t = new Date();
 					hr=t.getHours();
@@ -653,6 +684,8 @@
 				}
 			}else{
 				timetoggle=false;
+				d3.select("#clock-face").style("opacity", 0.4);
+				d3.select("#timeinput").attr("disabled", true);
 				if(!allpokemons){
 					if(searching){
 						showSearchedPokemon(pokemons, searchedpokemon);
@@ -1145,16 +1178,16 @@
 			if(weatherchange && currentweather=="Clear"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
-				d3.select("#clear").style("border", "none");
+				d3.select("#clear").style("opacity", 0.6);
 			}else{
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Clear").style("opacity", 0.8);
 				currentweather="Clear";
 				weatherchange=true;
-				d3.select("#clear").style("border", "2px solid white");
-				d3.select("#cloudy").style("border", "none");
-				d3.select("#drizzle").style("border", "none");
-				d3.select("#breezy").style("border", "none");
+				d3.select("#clear").style("opacity", 1);
+				d3.select("#cloudy").style("opacity", 0.6);
+				d3.select("#drizzle").style("opacity", 0.6);
+				d3.select("#breezy").style("opacity", 0.6);
 			}
 			
 		}
@@ -1162,16 +1195,16 @@
 			if(weatherchange && currentweather=="Overcast"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
-				d3.select("#cloudy").style("border", "none");
+				d3.select("#cloudy").style("opacity", 0.6);
 			}else{			
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Overcast").style("opacity", 0.8);
 				currentweather="Overcast";
 				weatherchange=true;
-				d3.select("#cloudy").style("border", "2px solid white");
-				d3.select("#clear").style("border", "none");
-				d3.select("#drizzle").style("border", "none");
-				d3.select("#breezy").style("border", "none");
+				d3.select("#cloudy").style("opacity", 1);
+				d3.select("#clear").style("opacity", 0.6);
+				d3.select("#drizzle").style("opacity", 0.6);
+				d3.select("#breezy").style("opacity", 0.6);
 			}
 
 		}
@@ -1179,16 +1212,16 @@
 			if(weatherchange && currentweather=="Drizzle"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
-				d3.select("#drizzle").style("border", "none");
+				d3.select("#drizzle").style("opacity", 0.6);
 			}else{			
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Drizzle").style("opacity", 0.8);
 				currentweather="Drizzle";
 				weatherchange=true;
-				d3.select("#drizzle").style("border", "2px solid white");
-				d3.select("#clear").style("border", "none");
-				d3.select("#cloudy").style("border", "none");
-				d3.select("#breezy").style("border", "none");
+				d3.select("#drizzle").style("opacity", 1);
+				d3.select("#clear").style("opacity", 0.6);
+				d3.select("#cloudy").style("opacity", 0.6);
+				d3.select("#breezy").style("opacity", 0.6);
 			}
 			
 		}
@@ -1196,16 +1229,16 @@
 			if(weatherchange && currentweather=="Breezy"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
-				d3.select("#breezy").style("border", "none");
+				d3.select("#breezy").style("opacity", 0.6);
 			}else{			
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Breezy").style("opacity", 0.8);
 				currentweather="Breezy";
 				weatherchange=true;
-				d3.select("#breezy").style("border", "2px solid white");
-				d3.select("#clear").style("border", "none");
-				d3.select("#cloudy").style("border", "none");
-				d3.select("#drizzle").style("border", "none");
+				d3.select("#breezy").style("opacity", 1);
+				d3.select("#clear").style("opacity", 0.6);
+				d3.select("#cloudy").style("opacity", 0.6);
+				d3.select("#drizzle").style("opacity", 0.6);
 			}
 			
 		}
