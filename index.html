@@ -691,13 +691,12 @@
 		var searchedpokemon="";
 
 		function getSearchedName(form){
-			searchedpokemon=form.pokemonsearch.value;
-			showSearchedPokemon(pokemons);
+			searchedpokemon=form.pokemonsearch.value.toLowerCase();
+			showSearchedPokemon(pokemons, searchedpokemon);
 		}
 
-		function showSearchedPokemon(pokemons){
+		function showSearchedPokemon(pokemons, searchedpokemon){
 			searching=true;
-			console.log("hello");
 			allpokemons=false;
 
 			var minhr, maxhr, minminute, maxminute;
@@ -737,7 +736,7 @@
 
 			svg.selectAll("image")
 			.data(pokemons.filter(function(d) {
-				return searchedpokemon==d.name && ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
+				return searchedpokemon==d.name.toLowerCase() && ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute)) && d.weather==currentweather;
 			}))
 			.enter().append("image")
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
