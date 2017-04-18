@@ -11,7 +11,7 @@
 	#weatherintro {
 		position: absolute;
 		left: 74%;
-		top: 9%;
+		top: 26%;
 		font-size: 14px;
 		font-family: Georgia;
 		color: white;
@@ -19,7 +19,7 @@
 	#timeintro {
 		position: absolute;
 		left: 74%;
-		top: 27%;
+		top: 45%;
 		font-size: 14px;
 		font-family: Georgia;
 		color: white;
@@ -27,7 +27,7 @@
 	#buttons {
 		position: absolute;
 		left: 74%;
-		top: 15%;
+		top: 32%;
 	}
 
 	#logo {
@@ -47,7 +47,15 @@
 	#battleintro {
 		position: absolute;
 		left: 74%;
-		top: 74%;
+		top: 77%;
+		font-size: 14px;
+		font-family: Georgia;
+		color: white;
+	}
+	#searchintro {
+		position: absolute;
+		left: 74%;
+		top: 11%;
 		font-size: 14px;
 		font-family: Georgia;
 		color: white;
@@ -65,16 +73,16 @@
 	}
 
 	.second-hand{
-		stroke-width:3;
+		stroke-width:2;
 	}
 
 	.minute-hand{
-		stroke-width:5;
+		stroke-width:4;
 		stroke-linecap:round;
 	}
 
 	.hour-hand{
-		stroke-width:10;
+		stroke-width:6;
 		stroke: blue;
 		stroke-linecap:round;
 	}
@@ -110,22 +118,22 @@
 
 	#clock{
 		position: absolute;
-		top:34%;
-		left:71%;
+		top:50%;
+		left:74%;
 		/*transform: scale(0.5);
 		transform-origin: left;*/
 	}
 
 	#timeinput{
 		position: absolute;
-		top:33%;
+		top:50%;
 		left:74%;
 	}
 
 	#vs{
 		position: absolute;
 		left:80%;
-		top:80%;
+		top:83%;
 	}
 
 	#gymsvg {
@@ -149,7 +157,7 @@
 
 	#showall {
 		position: absolute;
-		left:89%;
+		left:74%;
 		top:4%;
 		font-family: Georgia;
 		font-size: 14px;
@@ -162,15 +170,17 @@
 
 	#search {
 		position: absolute;
-		left:71%;
-		top:3%;
+		left:74%;
+		top:16%;
 		font-family: Georgia;
 		font-size: 14px;
 		color:white;
 		stroke-width: 2;
-		padding: 3px 5px;
+		/*padding: 3px 5px;*/
     	border: 2px solid white;
 		border-radius: 4px;
+		height: 24;
+
 	}
 
 	input[type=range]{
@@ -201,7 +211,7 @@
 
 	 #sidebar {
 		width:600px;
-		height: 900px;
+		height: 1000px;
 		position: absolute;
 		left: 70%;
 		top: 0;
@@ -216,8 +226,35 @@
 	 #divider{
 		position: absolute;
 		left:70%;
-		top:73%;
+		top:76%;
 	 }
+
+	 #text {
+		 background-color: transparent;
+		 border: none;
+	 }
+
+	 #searchbutton {
+		 background-color: #FFD707;
+    border: none;
+    color: white;
+    padding: 3px 3px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+		font-family: Georgia;
+		height:25;
+
+	 }
+
+
+	 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: white;
+	opacity: 0.6;
+	font-size: 11;
+	font-family: Georgia;
+}
 
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -230,15 +267,17 @@
 
 	<audio id="fireaudio" src="fire.mp3"></audio>
 	<rect id="sidebar"></rect>
-	<svg id="map" height="810" width="1300">
+	<svg id="map" height="1000" width="1300">
 		<img id="zoomin"  src="zoomin.png" width="20" height="20" onclick="zoomIn()">
 		<img id="zoomout" src="zoomout.png" width="20" height="20" onclick="zoomOut()">
 		<img id="logo" src="Pokemon-logo.png" alt="logo" height="80" width="208">
 		<p id="intro">This interactive web shows the distribution of <br>Pokemons in New York Area in PokemonGo. <p>
 	</svg>
+
+	<p id="searchintro">Search the pokemon you want!</p>
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
-	<p id="battleintro">Let them battle!</p>
+	<p id="battleintro">Drag two pokemons here and let them battle!</p>
 		<svg id="clock" height="500" width="500"></svg>
 	<div id="buttons">
 		<button id="clear"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
@@ -249,12 +288,13 @@
 	<svg id="gymsvg" width="400" height="330">
 	<!-- <rect id="gym" width="250" height="130" style="fill:white;stroke-width:2;stroke:#3664AD" /> -->
 	<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
+	<circle cx="30" cy="30" r="30"></circle>
 	</svg>
 
 	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
 	<form id="search" onsubmit="getSearchedName(this); return false;">
-		<input type="text" name="pokemonsearch" placeholder="Type in a Pokemon name..." width=400>
-		<input type="button" value="Search" onclick="getSearchedName(this.form)">
+		<input id="text" type="text" name="pokemonsearch" placeholder="Type in a Pokemon name..." width=400>
+		<input id="searchbutton" type="button" value="Search" onclick="getSearchedName(this.form)">
 	</form>
 	<button id="showall">Show all Pokemons</button>
 	<svg id="divider" height="210" width="500">
@@ -273,18 +313,18 @@
 
 		////clock code is inspired from http://bl.ocks.org/tomgp/6475678
 		var radians = 0.0174532925,
-			clockRadius = 100,
+			clockRadius = 60,
 			hourHandLength = 2*clockRadius/4,
-			minuteHandLength = clockRadius-10,
-			secondHandLength = clockRadius-20,
-			secondHandBalance = 30,
+			minuteHandLength = clockRadius-13,
+			secondHandLength = clockRadius-13,
+			secondHandBalance = 10,
 			secondTickStart = clockRadius;
-			secondTickLength = -8,
+			secondTickLength = -5,
 			hourTickStart = clockRadius,
-			hourTickLength = -12,
-			secondLabelRadius = clockRadius + 13;
+			hourTickLength = -8,
+			secondLabelRadius = clockRadius + 10;
 			secondLabelYOffset = 5
-			hourLabelRadius = clockRadius - 22,
+			hourLabelRadius = clockRadius - 15,
 			hourLabelYOffset = 7;
 
 		var hourScale = d3.scaleLinear()
@@ -531,7 +571,7 @@
 				showPokemon(pokemons, hr, min);
 			}
             d3.select("body").style("background-color", backgroundColor(hr));
-            svg.style("background-color", backgroundColor(hr));
+            // svg.style("background-color", backgroundColor(hr));
 		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
@@ -625,7 +665,7 @@
 			.attr("width", 20)
 			.attr("href", function(d){return d.imgURL;})
 			.classed("draggable", "true")
-			.attr("opacity", 0.6)
+			.attr("opacity", 0.8)
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
@@ -633,7 +673,7 @@
 				showBio(d);
 			})
 			.on("mouseout", function(d){
-				this.setAttribute("opacity", 0.6);
+				this.setAttribute("opacity", 0.8);
 				this.setAttribute("cursor", "default");
 				hideBio(d);
 			})
@@ -662,7 +702,7 @@
 			.attr("width", 20)
 			.attr("href", function(d){return d.imgURL;})
 			.classed("draggable", "true")
-			.attr("opacity", 0.6)
+			.attr("opacity", 0.8)
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
@@ -670,7 +710,7 @@
 				showBio(d);
 			})
 			.on("mouseout", function(d){
-				this.setAttribute("opacity", 0.6);
+				this.setAttribute("opacity", 0.8);
 				this.setAttribute("cursor", "default");
 				hideBio(d);
 			})
@@ -683,7 +723,7 @@
 
 			if(weatherchange){
 				svg.selectAll("image").style("opacity", 0);
-				svg.selectAll("."+currentweather).style("opacity", 0.6);
+				svg.selectAll("."+currentweather).style("opacity", 0.8);
 			}
 		}
 
@@ -747,7 +787,7 @@
 			.attr("width", 20)
 			.attr("href", function(d){return d.imgURL;})
 			.classed("draggable", "true")
-			.attr("opacity", 0.6)
+			.attr("opacity", 0.8)
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")")
 			.on("mouseover", function(d){
 				this.setAttribute("opacity", 1.0);
@@ -755,7 +795,7 @@
 				showBio(d);
 			})
 			.on("mouseout", function(d){
-				this.setAttribute("opacity", 0.6);
+				this.setAttribute("opacity", 0.8);
 				this.setAttribute("cursor", "default");
 				hideBio(d);
 			})
@@ -986,25 +1026,25 @@
 
 		function clear_clicked(){
 			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Clear").style("opacity", 0.6);
+			svg.selectAll(".Clear").style("opacity", 0.8);
 			currentweather="Clear";
 			weatherchange=true;
 		}
 		function cloudy_clicked(){
 			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Overcast").style("opacity", 0.6);
+			svg.selectAll(".Overcast").style("opacity", 0.8);
 			currentweather="Overcast";
 			weatherchange=true;
 		}
 		function drizzle_clicked(){
 			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Drizzle").style("opacity", 0.6);
+			svg.selectAll(".Drizzle").style("opacity", 0.8);
 			currentweather="Drizzle";
 			weatherchange=true;
 		}
 		function breezy_clicked(){
 			svg.selectAll("image").style("opacity", 0);
-			svg.selectAll(".Breezy").style("opacity", 0.6);
+			svg.selectAll(".Breezy").style("opacity", 0.8);
 			currentweather="Breezy";
 			weatherchange=true;
 		}
@@ -1075,7 +1115,7 @@
 				d3.select(this)
 				.attr("x", projection(d.coordinate)[0])
 				.attr("y", projection(d.coordinate)[1])
-				.attr("opacity", 0.6);
+				.attr("opacity", 0.8);
 			}else{
 				numpokemons++;
 				if(numpokemons==1){
