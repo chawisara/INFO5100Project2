@@ -13,7 +13,7 @@
 		left: 74%;
 		top: 26%;
 		font-size: 14px;
-		font-family: Georgia;
+		font-family: Roboto;
 		color: white;
 	}
 	#timeintro {
@@ -21,7 +21,7 @@
 		left: 74%;
 		top: 45%;
 		font-size: 14px;
-		font-family: Georgia;
+		font-family: Roboto;
 		color: white;
 	}
 	#buttons {
@@ -41,7 +41,7 @@
 		left: 20px;
 		top: 90px;
 		font-size: 13px;
-		font-family: Georgia;
+		font-family: Roboto;
 		color: #3664AD;
 	}
 	#battleintro {
@@ -49,7 +49,7 @@
 		left: 74%;
 		top: 77%;
 		font-size: 14px;
-		font-family: Georgia;
+		font-family: Roboto;
 		color: white;
 	}
 	#searchintro {
@@ -57,7 +57,7 @@
 		left: 74%;
 		top: 11%;
 		font-size: 14px;
-		font-family: Georgia;
+		font-family: Roboto;
 		color: white;
 	}
 	#map {
@@ -120,6 +120,8 @@
 		position: absolute;
 		top:50%;
 		left:74%;
+		/*transform: scale(0.5);
+		transform-origin: left;*/
 	}
 
 	#timeinput{
@@ -137,7 +139,7 @@
 	#gymsvg {
 		position: absolute;
 		left:74%;
-		top:83%;
+		top:82%;
 	}
 
 	#zoomin {
@@ -157,7 +159,7 @@
 		position: absolute;
 		left:74%;
 		top:4%;
-		font-family: Georgia;
+		font-family: Roboto;
 		font-size: 14px;
 		color:white;
 		stroke-width: 2;
@@ -170,7 +172,7 @@
 		position: absolute;
 		left:74%;
 		top:16%;
-		font-family: Georgia;
+		font-family: Roboto;
 		font-size: 14px;
 		color:white;
 		stroke-width: 2;
@@ -230,7 +232,7 @@
 	 #text {
 		 background-color: transparent;
 		 border: none;
-		 color:white;
+		 font-family: Roboto;
 	 }
 
 	 #searchbutton {
@@ -242,18 +244,18 @@
     text-decoration: none;
     display: inline-block;
     font-size: 13px;
-		font-family: Georgia;
+		font-family: Roboto;
 		height:25;
 
 	 }
 
 
-	::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-		color: white;
-		opacity: 0.6;
-		font-size: 11;
-		font-family: Georgia;
-	}
+	 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: white;
+	opacity: 0.6;
+	font-size: 11;
+	font-family: Roboto;
+}
 
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -274,10 +276,10 @@
 	</svg>
 
 	<p id="searchintro">Search the pokemon you want!</p>
-	<p id="weatherintro">See in what weather they will show up</p>
-	<p id="timeintro">See what time they will show up</p>
+	<p id="weatherintro">See what weather will they show up</p>
+	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Drag two pokemons here and let them battle!</p>
-		<svg id="clock" height="200" width="200"></svg>
+		<svg id="clock" height="500" width="500"></svg>
 	<div id="buttons">
 		<button id="clear" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
 		<button id="cloudy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
@@ -285,17 +287,12 @@
 		<button id="breezy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/snow1x.png" style="width:50px;height:50px;"></button>
 	</div>
 	<svg id="gymsvg" width="400" height="330">
-	<rect id="gym" width="280" height="110" style="fill:none;stroke-width:2;stroke:white" />
-	<img id="vs" src="vs.png" alt="vs" height="100" width="80">
+	<rect id="gym" width="250" height="130" style="fill:none;stroke-width:2;stroke:white" />
+	<img id="vs" src="vs.png" alt="vs" height="100"  width="80">
 	<circle cx="30" cy="30" r="30"></circle>
 	</svg>
 
-	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/>
-	<!-- <label class="switch">
-		<input type="checkbox" id="timetoggle" onclick="toggleTime(this)">
-		<div class="slider round"></div>
-	</label> -->
-	<br>
+	<input type="range" id="timeinput" min=0 max=24 style="width:170px"/><br>
 	<form id="search" onsubmit="getSearchedName(this); return false;">
 		<input id="text" type="text" name="pokemonsearch" placeholder="Type in a Pokemon name..." width=400>
 		<input id="searchbutton" type="button" value="Search" onclick="getSearchedName(this.form)">
@@ -376,12 +373,12 @@
 
 		var allpokemons=false;
 		var weatherchange=false;
+
 		var timechange=false;
 		var timetoggle=false;
 
 		var searching=false;
 		var searchedpokemon="";
-
 
 		loadMap(currentzoom);
 
@@ -400,6 +397,8 @@
 				this.parentNode.appendChild(this);
 			});
 		};
+
+	    d3.select("#gymsvg").moveToBack();
 
 		function loadMap(currentzoom){
 
@@ -578,7 +577,6 @@
 			d3.selectAll("#cloudy").style("opacity", 0.6);
 			d3.selectAll("#drizzle").style("opacity", 0.6);
 			d3.selectAll("#breezy").style("opacity", 0.6);
-
 			showAllPokemons(pokemons);
 		});
 
@@ -598,7 +596,7 @@
 			}else{
 				showPokemon(pokemons, hr, min);
 			}
-			d3.select("body").style("background-color", backgroundColor(hr));
+            d3.select("body").style("background-color", backgroundColor(hr));
 		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
@@ -707,7 +705,6 @@
 				.on("drag", dragged)
 				.on("end", dragended));
 
-
 			if(weatherchange){
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll("."+currentweather).style("opacity", 0.8);
@@ -752,6 +749,7 @@
 				svg.selectAll("."+currentweather).style("opacity", 0.8);
 			}
 		}
+
 
 		function getSearchedName(form){
 			searchedpokemon=form.pokemonsearch.value.toLowerCase();
@@ -804,7 +802,6 @@
 				}else{
 					return searchedpokemon==d.name.toLowerCase();
 				}
-				
 			}))
 			.enter().append("image")
 			.attr("id", function(d){var latitude=d.coordinate[1].toString().replace(".", ""); return d.name+""+latitude;})
@@ -984,7 +981,7 @@
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+26)
 			.text("Name: " + d.name)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			svg.append("text")
@@ -992,7 +989,7 @@
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+44)
 			.text("Type1: " + d.type1)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			svg.append("text")
@@ -1000,7 +997,7 @@
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+58+4)
 			.text("Type2: " + d.type2)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			svg.append("text")
@@ -1008,7 +1005,7 @@
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+76+4)
 			.text("Attack: " + d.attack)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			svg.append("text")
@@ -1016,7 +1013,7 @@
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+94+4)
 			.text("Defense: " + d.defense)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			svg.append("text")
@@ -1024,7 +1021,7 @@
 			.attr("x",d3.event.clientX-320+8)
 			.attr("y",d3.event.clientY+112+4)
 			.text("Speed: " + d.speed)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			svg.append("text")
@@ -1032,7 +1029,7 @@
 			 .attr("x",d3.event.clientX-320+8)
 			 .attr("y",d3.event.clientY+130+6)
 			 .text("Total Power: " + d.total)
-			 .attr("font-family","Georgia")
+			 .attr("font-family","Roboto")
 			 .attr("font-size","14px");
 
 			svg.append("image")
@@ -1072,14 +1069,13 @@
 				d3.select("#drizzle").style("opacity", 0.6);
 				d3.select("#breezy").style("opacity", 0.6);
 			}
-			
 		}
 		function cloudy_clicked(){
 			if(weatherchange && currentweather=="Overcast"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
 				d3.select("#cloudy").style("opacity", 0.6);
-			}else{			
+			}else{
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Overcast").style("opacity", 0.8);
 				currentweather="Overcast";
@@ -1089,14 +1085,13 @@
 				d3.select("#drizzle").style("opacity", 0.6);
 				d3.select("#breezy").style("opacity", 0.6);
 			}
-
 		}
 		function drizzle_clicked(){
 			if(weatherchange && currentweather=="Drizzle"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
 				d3.select("#drizzle").style("opacity", 0.6);
-			}else{			
+			}else{
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Drizzle").style("opacity", 0.8);
 				currentweather="Drizzle";
@@ -1106,14 +1101,13 @@
 				d3.select("#cloudy").style("opacity", 0.6);
 				d3.select("#breezy").style("opacity", 0.6);
 			}
-			
 		}
 		function breezy_clicked(){
 			if(weatherchange && currentweather=="Breezy"){
 				weatherchange=false;
 				svg.selectAll("image").style("opacity", 0.8);
 				d3.select("#breezy").style("opacity", 0.6);
-			}else{			
+			}else{
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll(".Breezy").style("opacity", 0.8);
 				currentweather="Breezy";
@@ -1123,7 +1117,6 @@
 				d3.select("#cloudy").style("opacity", 0.6);
 				d3.select("#drizzle").style("opacity", 0.6);
 			}
-			
 		}
 
 		d3.select("#clear").on("click", clear_clicked);
@@ -1156,7 +1149,7 @@
 			.style("font-size", 16)
 			.style("fill", "#3c3c3c")
 			.text("drag two pokemons to the gym to compare their battle stats")
-			.style("font-family","Georgia");
+			.style("font-family","Roboto");
 		}
 
 		function dragged(d) {
@@ -1290,7 +1283,7 @@
 			.attr("y", height/5+60)
 			.text(pokemon1.name)
 			.attr('text-anchor','middle')
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","20px");
 
 			biopopup.append("text")
@@ -1299,7 +1292,7 @@
 			.attr("y", height/5+60)
 			.text(pokemon2.name)
 			.attr('text-anchor','middle')
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","20px");
 
 			biopopup.append("text")
@@ -1307,7 +1300,7 @@
 			.attr("x", width/5+100)
 			.attr("y", height/5+270)
 			.text("Type1: " + pokemon1.type1)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1315,7 +1308,7 @@
 			.attr("x", width/5+400)
 			.attr("y", height/5+270)
 			.text("Type1: " + pokemon2.type1)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1323,7 +1316,7 @@
 			.attr("x", width/5+100)
 			.attr("y", height/5+290)
 			.text("Type2: " + pokemon1.type2)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1331,7 +1324,7 @@
 			.attr("x", width/5+400)
 			.attr("y", height/5+290)
 			.text("Type2: " + pokemon2.type2)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1339,7 +1332,7 @@
 			.attr("x",width/5+100)
 			.attr("y",height/5+310)
 			.text("Attack: " + pokemon1.attack)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1347,7 +1340,7 @@
 			.attr("x",width/5+400)
 			.attr("y",height/5+310)
 			.text("Attack: " + pokemon2.attack)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1355,7 +1348,7 @@
 			.attr("x",width/5+100)
 			.attr("y",height/5+330)
 			.text("Defense: " + pokemon1.defense)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1363,7 +1356,7 @@
 			.attr("x",width/5+400)
 			.attr("y",height/5+330)
 			.text("Defense: " + pokemon2.defense)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1371,7 +1364,7 @@
 			.attr("x",width/5+100)
 			.attr("y",height/5+350)
 			.text("Speed: " + pokemon1.speed)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			biopopup.append("text")
@@ -1379,7 +1372,7 @@
 			.attr("x",width/5+400)
 			.attr("y",height/5+350)
 			.text("Speed: " + pokemon2.speed)
-			.attr("font-family","Georgia")
+			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
 			if(pokemon1.total>pokemon2.total){
@@ -1389,7 +1382,7 @@
 				.attr("y", height/5+385)
 				.text(pokemon1.name+" is more likely to win!")
 				.attr('text-anchor','middle')
-				.attr("font-family","Georgia")
+				.attr("font-family","Roboto")
 				.attr("font-size","20px");
 			}else if(pokemon1.total==pokemon2.total){
 				biopopup.append("text")
@@ -1398,7 +1391,7 @@
 				.attr("y", height/5+385)
 				.text("Seems like it's going to be a tie!")
 				.attr('text-anchor','middle')
-				.attr("font-family","Georgia")
+				.attr("font-family","Roboto")
 				.attr("font-size","20px");
 			}else{
 				biopopup.append("text")
@@ -1407,7 +1400,7 @@
 				.attr("y", height/5+385)
 				.text(pokemon2.name+" is more likely to win!")
 				.attr('text-anchor','middle')
-				.attr("font-family","Georgia")
+				.attr("font-family","Roboto")
 				.attr("font-size","20px");
 			}
 
