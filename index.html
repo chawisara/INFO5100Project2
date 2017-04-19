@@ -572,51 +572,15 @@
 			allpokemons=true;
 			weatherchange=false;
 			timechange=false;
+			timetoggle=false;
 			svg.selectAll("image").remove().transition();
 			d3.selectAll("#clear").style("opacity", 0.6);
 			d3.selectAll("#cloudy").style("opacity", 0.6);
 			d3.selectAll("#drizzle").style("opacity", 0.6);
 			d3.selectAll("#breezy").style("opacity", 0.6);
 
-			// d3.select("#timetoggle").attr("checked", false);
-			// d3.select(".slider").attr("before", false);
-
 			showAllPokemons(pokemons);
 		});
-
-
-		// function toggleTime(){
-		// 	if(!timetoggle){
-		// 		timetoggle=true;
-		// 		d3.select("#clock-face").style("opacity", 1);
-		// 		d3.select("#timeinput").attr("disabled", null);
-
-		// 		if(hr==null && min==null){
-		// 			var t = new Date();
-		// 			hr=t.getHours();
-		// 			min=t.getMinutes();
-		// 		}
-		// 		svg.selectAll("image").remove();
-		// 		if(searching){
-		// 			showSearchedPokemon(pokemons, searchedpokemon);
-		// 		}else{
-		// 			showPokemon(pokemons, hr, min);
-		// 		}
-		// 	}else{
-		// 		timetoggle=false;
-		// 		d3.select("#clock-face").style("opacity", 0.4);
-		// 		d3.select("#timeinput").attr("disabled", true);
-		// 		if(!allpokemons){
-		// 			if(searching){
-		// 				showSearchedPokemon(pokemons, searchedpokemon);
-		// 			}else{
-		// 				allpokemons=true;
-		// 				showAllPokemons(pokemons);
-		// 			}
-					
-		// 		}
-		// 	}
-		// }
 
 		d3.select("#timeinput")
 		.on("input", function() {
