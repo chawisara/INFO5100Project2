@@ -120,13 +120,6 @@
 		position: absolute;
 		top:50%;
 		left:74%;
-		cursor:pointer;
-		/*transform: scale(0.5);
-		transform-origin: left;*/
-	}
-
-	#clock-face{
-		opacity:0.4;
 	}
 
 	#timeinput{
@@ -134,65 +127,6 @@
 		top:50%;
 		left:74%;
 	}
-
-	/*reference: https://www.w3schools.com/howto/howto_css_switch.asp*/
-/*	.switch {
-		position: absolute;
-		display: inline-block;
-		width: 35px;
-		height: 20px;
-		top:48%;
-		left:90%;
-	}
-
-	.switch input {display:none;}
-
-	.slider {
-		position: absolute;
-		cursor: pointer;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: #ccc;
-		-webkit-transition: .4s;
-		transition: .4s;
-	}
-
-	.slider:before {
-		position: absolute;
-		content: "";
-		height: 15px;
-		width: 15px;
-		left: 4px;
-		bottom: 4px;
-		top:2px;
-		background-color: white;
-		-webkit-transition: .4s;
-		transition: .4s;
-	}
-
-	input:checked + .slider {
-		background-color: #2196F3;
-	}
-
-	input:focus + .slider {
-		box-shadow: 0 0 1px #2196F3;
-	}
-
-	input:checked + .slider:before {
-		-webkit-transform: translateX(13px);
-		-ms-transform: translateX(13px);
-		transform: translateX(13px);
-	}
-
-	.slider.round {
-		border-radius: 34px;
-	}
-
-	.slider.round:before {
-		border-radius: 50%;
-	}*/
 
 	#vs{
 		position: absolute;
@@ -202,8 +136,8 @@
 
 	#gymsvg {
 		position: absolute;
-		left:73%;
-		top:78%;
+		left:74%;
+		top:83%;
 	}
 
 	#zoomin {
@@ -340,13 +274,10 @@
 	</svg>
 
 	<p id="searchintro">Search the pokemon you want!</p>
-	<p id="weatherintro">See what weather will they show up</p>
-	<p id="timeintro">Click on the clock to see what time they will show up</p>
+	<p id="weatherintro">See in what weather they will show up</p>
+	<p id="timeintro">See what time they will show up</p>
 	<p id="battleintro">Drag two pokemons here and let them battle!</p>
-		<svg id="clock" height="200" width="200" onclick="toggleTime()" onmouseover="showClockText()" onmouseout="hideClockText()">
-			<text id="clocktext1" x="49" y="90" style="fill:#686868;stroke:white; font-size:12px; opacity:0">Click on me to turn on</text>			
-			<text id="clocktext2" x="70" y="110" style="fill:#686868; stroke:white; font-size:12px; opacity:0">the time filter</text>
-		</svg>
+		<svg id="clock" height="200" width="200"></svg>
 	<div id="buttons">
 		<button id="clear" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
 		<button id="cloudy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
@@ -354,7 +285,7 @@
 		<button id="breezy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/snow1x.png" style="width:50px;height:50px;"></button>
 	</div>
 	<svg id="gymsvg" width="400" height="330">
-	<!-- <rect id="gym" width="250" height="130" style="fill:white;stroke-width:2;stroke:#3664AD" /> -->
+	<rect id="gym" width="280" height="110" style="fill:none;stroke-width:2;stroke:white" />
 	<img id="vs" src="vs.png" alt="vs" height="100" width="80">
 	<circle cx="30" cy="30" r="30"></circle>
 	</svg>
@@ -653,69 +584,57 @@
 			showAllPokemons(pokemons);
 		});
 
-		function showClockText(){
-			if(!timetoggle){
-				d3.select("#clocktext1").style("opacity", 1);
-				d3.select("#clocktext2").style("opacity", 1);
-			}
-		}
 
-		function hideClockText(){
-			d3.select("#clocktext1").style("opacity", 0);
-			d3.select("#clocktext2").style("opacity", 0);
-		}
+		// function toggleTime(){
+		// 	if(!timetoggle){
+		// 		timetoggle=true;
+		// 		d3.select("#clock-face").style("opacity", 1);
+		// 		d3.select("#timeinput").attr("disabled", null);
 
-		function toggleTime(){
-			if(!timetoggle){
-				timetoggle=true;
-				d3.select("#clock-face").style("opacity", 1);
-				d3.select("#timeinput").attr("disabled", null);
-
-				if(hr==null && min==null){
-					var t = new Date();
-					hr=t.getHours();
-					min=t.getMinutes();
-				}
-				svg.selectAll("image").remove();
-				if(searching){
-					showSearchedPokemon(pokemons, searchedpokemon);
-				}else{
-					showPokemon(pokemons, hr, min);
-				}
-			}else{
-				timetoggle=false;
-				d3.select("#clock-face").style("opacity", 0.4);
-				d3.select("#timeinput").attr("disabled", true);
-				if(!allpokemons){
-					if(searching){
-						showSearchedPokemon(pokemons, searchedpokemon);
-					}else{
-						allpokemons=true;
-						showAllPokemons(pokemons);
-					}
+		// 		if(hr==null && min==null){
+		// 			var t = new Date();
+		// 			hr=t.getHours();
+		// 			min=t.getMinutes();
+		// 		}
+		// 		svg.selectAll("image").remove();
+		// 		if(searching){
+		// 			showSearchedPokemon(pokemons, searchedpokemon);
+		// 		}else{
+		// 			showPokemon(pokemons, hr, min);
+		// 		}
+		// 	}else{
+		// 		timetoggle=false;
+		// 		d3.select("#clock-face").style("opacity", 0.4);
+		// 		d3.select("#timeinput").attr("disabled", true);
+		// 		if(!allpokemons){
+		// 			if(searching){
+		// 				showSearchedPokemon(pokemons, searchedpokemon);
+		// 			}else{
+		// 				allpokemons=true;
+		// 				showAllPokemons(pokemons);
+		// 			}
 					
-				}
-			}
-		}
+		// 		}
+		// 	}
+		// }
 
 		d3.select("#timeinput")
 		.on("input", function() {
-			if(timetoggle){
-				var time=+this.value;
-				hr=Math.floor(time);
-				min=Math.ceil((time%1)*60);
-				updateData();
-				moveHands();
-				svg.selectAll("image").remove().transition();
-				allpokemons=false;
-				timechange=true;
-				if(searching){
-					showSearchedPokemon(pokemons, searchedpokemon);
-				}else{
-					showPokemon(pokemons, hr, min);
-				}
-				d3.select("body").style("background-color", backgroundColor(hr));
+			timetoggle=true;
+			var time=+this.value;
+			hr=Math.floor(time);
+			min=Math.ceil((time%1)*60);
+			updateData();
+			moveHands();
+			svg.selectAll("image").remove().transition();
+			allpokemons=false;
+			timechange=true;
+			if(searching){
+				showSearchedPokemon(pokemons, searchedpokemon);
+			}else{
+				showPokemon(pokemons, hr, min);
 			}
+			d3.select("body").style("background-color", backgroundColor(hr));
 		});
 
 		var dataPoints = function(imgdata, weatherdata, statsdata){
