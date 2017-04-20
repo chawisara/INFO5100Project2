@@ -6,9 +6,9 @@
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
 <style>
 	body { font-family: "Muli", sans-serif; background-color: #FFD707;}
-	/*svg {border: solid #ccc 1px; }*/
 	path { fill: #0D46A3; opacity: 0.85;stroke: white; stroke-width: 1px;}
 	button { background-color: transparent; border: none;}
+
 	#weatherintro {
 		position: absolute;
 		left: 74%;
@@ -22,7 +22,7 @@
 		left: 74%;
 		top: 45%;
 		font-size: 14px;
-		font-family: Roboto;
+		font-family: "Roboto";
 		color: white;
 	}
 	#buttons {
@@ -42,7 +42,7 @@
 		left: 20px;
 		top: 90px;
 		font-size: 13px;
-		font-family: Roboto;
+		font-family: "Roboto";
 		color: #3664AD;
 	}
 	#battleintro {
@@ -50,7 +50,7 @@
 		left: 74%;
 		top: 77%;
 		font-size: 14px;
-		font-family: Roboto;
+		font-family: "Roboto";
 		color: white;
 	}
 	#searchintro {
@@ -58,7 +58,7 @@
 		left: 74%;
 		top: 11%;
 		font-size: 14px;
-		font-family: Roboto;
+		font-family: "Roboto";
 		color: white;
 	}
 	#map {
@@ -66,7 +66,7 @@
 		left:-2%;
 	}
 
-
+	/*clock code retrieved from http://bl.ocks.org/tomgp/6475678*/
 	#rim {
 		fill: none;
 		stroke: #999;
@@ -121,8 +121,6 @@
 		position: absolute;
 		top:50%;
 		left:74%;
-		/*transform: scale(0.5);
-		transform-origin: left;*/
 	}
 
 	#timeinput{
@@ -160,12 +158,12 @@
 		position: absolute;
 		left:74%;
 		top:4%;
-		font-family: Roboto;
+		font-family: "Roboto";
 		font-size: 14px;
 		color:white;
 		stroke-width: 2;
 		padding: 3px 5px;
-    border: 2px solid white;
+    	border: 2px solid white;
 		border-radius: 4px;
 	}
 
@@ -173,11 +171,10 @@
 		position: absolute;
 		left:74%;
 		top:16%;
-		font-family: Roboto;
+		font-family: "Roboto";
 		font-size: 14px;
 		color:white;
 		stroke-width: 2;
-		/*padding: 3px 5px;*/
     	border: 2px solid white;
 		border-radius: 4px;
 		height: 24;
@@ -185,16 +182,16 @@
 	}
 
 	input[type=range]{
-		 -webkit-appearance: none;
-	 }
+		z-indexwebkit-appearance: none;
+	}
 
-	 input[type=range]::-webkit-slider-runnable-track {
+	input[type=range]::-webkit-slider-runnable-track {
 		width: 300px;
 		height: 3px;
 		background: #ddd;
 		border: none;
 		border-radius: 3px;
-	 }
+	}
 
 	 input[type=range]::-webkit-slider-thumb {
 		-webkit-appearance: none;
@@ -210,7 +207,7 @@
 		outline: none;
 	 }
 
-	 #sidebar {
+	#sidebar {
 		width:600px;
 		height: 1000px;
 		position: absolute;
@@ -218,45 +215,45 @@
 		top: 0;
 		background-color: #0D46A3; opacity: 0.85;
 
-	 }
+	}
 
-	 #gym {
+	#gym {
 		fill:white;
-	 }
+	}
 
-	 #divider{
+	#divider{
 		position: absolute;
 		left:70%;
 		top:76%;
-	 }
+	}
 
-	 #text {
-		 background-color: transparent;
-		 border: none;
-		 font-family: Roboto;
-	 }
+	#text {
+		background-color: transparent;
+		border: none;
+		font-family: "Roboto";
+	}
 
-	 #searchbutton {
-		 background-color: #FFD707;
-    border: none;
-    color: white;
-    padding: 3px 3px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 13px;
-		font-family: Roboto;
+	#searchbutton {
+		background-color: #FFD707;
+		border: none;
+		color: white;
+		padding: 3px 3px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 13px;
+		font-family: "Roboto";
 		height:25;
 
-	 }
+	}
 
 
-	 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: white;
-	opacity: 0.6;
-	font-size: 11;
-	font-family: Roboto;
-}
+	::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+		color: white;
+		opacity: 0.6;
+		font-size: 11;
+		font-family: "Roboto";
+	}
 
 </style>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -266,7 +263,6 @@
 </head>
 
 <body>
-
 	<audio id="fireaudio" src="fire.mp3"></audio>
 	<rect id="sidebar"></rect>
 	<svg id="map" height="1000" width="1300">
@@ -280,7 +276,7 @@
 	<p id="weatherintro">See what weather will they show up</p>
 	<p id="timeintro">See what time will they show up</p>
 	<p id="battleintro">Drag two pokemons here and let them battle!</p>
-		<svg id="clock" height="500" width="500"></svg>
+	<svg id="clock" height="500" width="500"></svg>
 	<div id="buttons">
 		<button id="clear" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/clear1x.png" style="width:50px;height:50px;"></button>
 		<button id="cloudy" style="cursor:pointer; opacity:0.6;"><img src="./weathericon/cloudy1x.png" style="width:50px;height:50px;"></button>
@@ -298,7 +294,7 @@
 		<input id="text" type="text" name="pokemonsearch" placeholder="Type in a Pokemon name..." width=400>
 		<input id="searchbutton" type="button" value="Search" onclick="getSearchedName(this.form)">
 	</form>
-	<button id="showall">Show all Pokemons</button>
+	<button id="showall" style="cursor:pointer">Show all Pokemons</button>
 	<svg id="divider" height="210" width="500">
 		<line x1="0" y1="0" x2="400" y2="0" style="stroke:#FFD707;stroke-width:6" />
 	</svg>
@@ -313,7 +309,7 @@
 		var width=900;
 		var height=900;
 
-		////clock code is inspired from http://bl.ocks.org/tomgp/6475678
+		//clock code is retrieved from http://bl.ocks.org/tomgp/6475678
 		var radians = 0.0174532925,
 			clockRadius = 60,
 			hourHandLength = 2*clockRadius/4,
@@ -360,8 +356,10 @@
 		];
 
 		var hr, min;
-        var backgroundColor = d3.scaleLinear().domain([24,12,0])
-            .interpolate(d3.interpolateRgb).range(["black", "#FFD707","black"]);
+
+		var backgroundColor = d3.scaleLinear().domain([24,12,0])
+		.interpolate(d3.interpolateRgb).range(["black", "#FFD707","black"]);
+
 		var currentzoom=0;
 		var zoomed=false;
 
@@ -401,17 +399,15 @@
 
 	    d3.select("#gymsvg").moveToBack();
 
-		function loadMap(currentzoom){
-
-			if(hr==null && min==null){
+		function loadMap(currentzoom){ //load NYC map
+			if(hr==null && min==null){ //get the current time if there's no user input (change in time)
 				var t = new Date();
 				hr=t.getHours();
 				min=t.getMinutes();
 			}
 
 			d3.json("nyc.json", function(json){
-
-				if(!zoomed){
+				if(!zoomed){ //starting map
 					projection = d3.geoMercator().fitExtent([[0, 10], [880, 800]], json);
 				}else{
 					if(currentzoom==0){
@@ -425,11 +421,12 @@
 					}
 
 					svg.selectAll("image").remove();
+
 					if(allpokemons){ //show all pokemons; can use weather filter
 						showAllPokemons(pokemons);
 					}else if(timechange){ //show pokemons only available during certain times; can use weather filter
 						showPokemon(pokemons, hr, min);
-					}else if(searching){
+					}else if(searching){ //show only the searched pokemon; can apply weather and time filter
 						showSearchedPokemon(pokemons, searchedpokemon);
 					}
 				}
@@ -447,6 +444,12 @@
 
 			});
 		}
+
+		var startingX=0, startingY=0;
+		var coordinates=[];
+		var newtranslation=[0,0];
+		var currenttranslation=[0,0];
+		var previoustranslation=[0,0];
 
 		function zoomIn(){
 			currenttranslation=[0,0];
@@ -472,17 +475,12 @@
 			}
 		}
 
+		//dragging functions inspired from: https://bl.ocks.org/mbostock/22994cc97fefaeede0d861e6815a847e
 		d3.select("#map")
 		.call(d3.drag()
 				.on("start", dragstartedmap)
 				.on("drag", draggedmap)
 				.on("end", dragendedmap));
-
-		var startingX=0, startingY=0;
-		var coordinates=[];
-		var newtranslation=[0,0];
-		var currenttranslation=[0,0];
-		var previoustranslation=[0,0];
 
 		function dragstartedmap(d) {
 			d3.event.sourceEvent.stopPropagation();
@@ -495,7 +493,7 @@
 		function draggedmap(d) {
 			if(currentzoom>0){
 				coordinates = d3.mouse(this);
-				newtranslation=[coordinates[0]-startingX, coordinates[1]-startingY]
+				newtranslation=[coordinates[0]-startingX, coordinates[1]-startingY] //calculate how much the user moved and move the map accordingly
 				currenttranslation[0]=newtranslation[0]+previoustranslation[0];
 				currenttranslation[1]=newtranslation[1]+previoustranslation[1];
 				svg.selectAll("path").attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
@@ -548,7 +546,7 @@
 			}
 		};
 
-
+		//load all 3 data sets and merge them to one variable: "pokemons"
 		d3.queue()
 		.defer(d3.csv, "pokemon-images.csv", parseRowImg)
 		.defer(d3.csv, "pokemon-weather-time-nyc.csv", parseRowWeatherTime)
@@ -603,6 +601,7 @@
 		var dataPoints = function(imgdata, weatherdata, statsdata){
 			var points = [];
 			weatherdata.forEach(function(data){
+				//choose only the Pokemons that are within the given NYC map's borders
 				if((data.Longitude>-74.2 && data.Longitude<-74.05 && data.Latitude<40.6 && data.Latitude>40.5) || (data.Longitude>-74 && data.Longitude<-73.8 && data.Latitude<40.9)){
 					var coordinate=[data.Longitude, data.Latitude];
 					var timeOfDay=data.TimeOfDay;
@@ -646,7 +645,8 @@
 
 		function showPokemon(pokemons, hour, minute) {
 			allpokemons=false;
-
+			//find the Pokemons that are available during the given period of time
+			//the range of time is calculated by assuming that the Pokemon stays in the location for only 15 minutes
 			var minhr, maxhr, minminute, maxminute;
 			if(minute<15){
 				if(hour==0){
@@ -706,13 +706,13 @@
 				.on("drag", dragged)
 				.on("end", dragended));
 
-			if(weatherchange){
+			if(weatherchange){ //weather filter
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll("."+currentweather).style("opacity", 0.8);
 			}
 		}
 
-		function showAllPokemons(pokemons){
+		function showAllPokemons(pokemons){ //clear all the filters
 			allpokemons=true;
 			searching=false;
 			svg.selectAll("image")
@@ -745,14 +745,14 @@
 				.on("drag", dragged)
 				.on("end", dragended));
 
-			if(weatherchange){
+			if(weatherchange){ //weather filter
 				svg.selectAll("image").style("opacity", 0);
 				svg.selectAll("."+currentweather).style("opacity", 0.8);
 			}
 		}
 
 
-		function getSearchedName(form){
+		function getSearchedName(form){ //retrieve the Pokemon name from search box
 			searchedpokemon=form.pokemonsearch.value.toLowerCase();
 			showSearchedPokemon(pokemons, searchedpokemon);
 		}
@@ -798,7 +798,7 @@
 
 			svg.selectAll("image")
 			.data(pokemons.filter(function(d) {
-				if(timetoggle){
+				if(timetoggle){ //shows the pokemon that's available during the given time IF the time filter has been applied
 					return searchedpokemon==d.name.toLowerCase() && ((d.hour==minhr && d.minute>=minminute) || (d.hour==maxhr && d.minute<=maxminute));
 				}else{
 					return searchedpokemon==d.name.toLowerCase();
@@ -838,17 +838,17 @@
 			}
 		}
 
-		function drawClock(){ //create all the clock elements
-			updateData();	//draw them in the correct starting position
+		//reference: http://bl.ocks.org/tomgp/6475678
+		function drawClock(){
+			updateData();
 
 			var svgclock=d3.select("#clock");
 
 			var face = svgclock.append('g')
 			.attr('id','clock-face')
-			.attr('transform','translate(' + (clockRadius + 50) + ',' + (clockRadius + 50) + ')');
+			.attr('transform','translate(' + (clockRadius+35) + ',' + (clockRadius+30) + ')');
 
-			//add marks for seconds
-			face.selectAll('.second-tick')
+			face.selectAll('.second-tick') //second marks
 			.data(d3.range(0,60)).enter()
 				.append('line')
 				.attr('class', 'second-tick')
@@ -859,8 +859,8 @@
 				.attr('transform',function(d){
 					return 'rotate(' + secondScale(d) + ')';
 				});
-			//and labels
-			face.selectAll('.second-label')
+
+			face.selectAll('.second-label') //second labels
 			.data(d3.range(5,61,5))
 			.enter()
 			.append('text')
@@ -876,8 +876,7 @@
 				return d;
 			});
 
-			//and hours
-			face.selectAll('.hour-tick')
+			face.selectAll('.hour-tick') //hour marks
 			.data(d3.range(0,12)).enter()
 			.append('line')
 			.attr('class', 'hour-tick')
@@ -889,7 +888,7 @@
 				return 'rotate(' + hourScale(d) + ')';
 			});
 
-			face.selectAll('.hour-label')
+			face.selectAll('.hour-label') //hour labels
 			.data(d3.range(3,13,3))
 			.enter()
 			.append('text')
@@ -905,7 +904,6 @@
 				return d;
 			});
 
-
 			var hands = face.append('g').attr('id','clock-hands');
 
 			face.append('g').attr('id','face-overlay')
@@ -915,7 +913,7 @@
 			.attr('r',clockRadius/20)
 			.style("stroke", "black");
 
-			hands.selectAll('line')
+			hands.selectAll('line') //hands of the clock
 			.data(handData)
 			.enter()
 			.append('line')
@@ -962,13 +960,12 @@
 
 		drawClock();
 
-		setInterval(function(){
+		setInterval(function(){ //update clock every second
 			updateData();
 			moveHands();
 		}, 1000);
 
-		function showBio(d){
-
+		function showBio(d){ //Pokemon details activated when hover on the Pokemon
 			svg.append("image")
 			.attr("id","bio")
 			.attr("x",d3.event.clientX-320)
@@ -1054,7 +1051,7 @@
 			d3.select("#bigimg").remove();
 		}
 
-
+		//weather filter buttons
 		function clear_clicked(){
 			if(weatherchange && currentweather=="Clear"){
 				weatherchange=false;
@@ -1125,10 +1122,11 @@
 		d3.select("#drizzle").on("click", drizzle_clicked);
 		d3.select("#breezy").on("click", breezy_clicked);
 
-		//reference: https://bl.ocks.org/mbostock/22994cc97fefaeede0d861e6815a847e
+		//dragging functions for Pokemon icons on map
 		function dragstarted(d) {
-			d3.select("#gym").style("stroke", "yellow");
+			d3.select("#gym").style("stroke", "black");
 
+			//instruction text activated when click/drag the Pokemon on the map
 			svg.append("rect")
 			.attr("id","draghighlight")
 			.attr("x", (width/2)-225+150)
@@ -1136,7 +1134,7 @@
 			.attr("rx", 20)
 			.attr("ry", 20)
 			.attr("height", 30)
-			.attr("width", 470)
+			.attr("width", 453)
 			.style("fill", "white")
 			.style("stroke", "#dcdcdc")
 			.style("opacity", 0.7);
@@ -1162,12 +1160,14 @@
 			.attr("height", "60")
 			.moveToFront();
 
+			d3.select("#gym").style("stroke", "black");
+
 			hideBio(d);
 		}
 
 		function dragended(d) {
 			d3.select(this).classed("active", false);
-			d3.select("#gym").style("stroke", "black");
+			d3.select("#gym").style("stroke", "white");
 			hideBio(d);
 
 			d3.select("#draghighlight").remove();
@@ -1177,8 +1177,8 @@
 			.attr("height", "20")
 			.attr("transform", "translate(" + currenttranslation[0] + ", " + currenttranslation[1] + ")");
 
-			if(!(d3.event.x>895 && d3.event.y>=240)){
-				if(pokemon1==d){
+			if(!(d3.event.x>895 && d3.event.y>=240)){ //if the dragged Pokemon is not in the gym
+				if(pokemon1==d){ //if the Pokemon is dragged from the gym back to the map
 					numpokemons=0;
 					pokemon1=null;
 				}else if(pokemon2==d){
@@ -1189,7 +1189,7 @@
 				.attr("x", projection(d.coordinate)[0])
 				.attr("y", projection(d.coordinate)[1])
 				.attr("opacity", 0.8);
-			}else{
+			}else{ //if the Pokemon is dragged to the gym
 				numpokemons++;
 				if(numpokemons==1){
 					pokemon1=d;
@@ -1376,6 +1376,7 @@
 			.attr("font-family","Roboto")
 			.attr("font-size","14px");
 
+			//the likelihood of a Pokemon winning the battle is simply based on the sum of the battle stats
 			if(pokemon1.total>pokemon2.total){
 				biopopup.append("text")
 				.attr("id","name2")
@@ -1404,7 +1405,6 @@
 				.attr("font-family","Roboto")
 				.attr("font-size","20px");
 			}
-
 
 		}
 
